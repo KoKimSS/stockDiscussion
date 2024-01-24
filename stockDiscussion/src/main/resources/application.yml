@@ -1,0 +1,10 @@
+spring:
+  profiles:
+    include:
+        - common
+        - database
+    active : local
+  mvc :
+    hiddenmethod:
+      filter:
+        enabled: true
