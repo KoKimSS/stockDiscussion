@@ -19,20 +19,18 @@ public class User extends BaseEntity {
     @Id
     @GeneratedValue
     private Long id;
-    private String loginId;
-
+    private String email;
     private String password;
     private String name;
-    private String email;
     private String introduction;
     private String img_path;
 
+    @Enumerated(value = EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
     @OneToMany(mappedBy = "following")
     private List<Follow> followers = new ArrayList<>();
 
     @OneToMany(mappedBy = "follower")
     private List<Follow> following = new ArrayList<>();
-    @Enumerated(value = EnumType.STRING)
-    @Column(nullable = false)
-    private Role role;
 }
