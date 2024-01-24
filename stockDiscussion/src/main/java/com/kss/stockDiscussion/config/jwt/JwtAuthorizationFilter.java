@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.kss.stockDiscussion.config.auth.PrincipalDetails;
 import com.kss.stockDiscussion.domain.user.User;
+import com.kss.stockDiscussion.repository.jwtBlackListRepository.JwtBlackListRepository;
 import com.kss.stockDiscussion.repository.userRepository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,10 +30,12 @@ import java.util.Optional;
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
     private final UserRepository userRepository;
+    private final JwtBlackListRepository jwtBlackListRepository;
 
-    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, UserRepository userRepository) {
+    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, UserRepository userRepository,JwtBlackListRepository jwtBlackListRepository) {
         super(authenticationManager);
         this.userRepository=userRepository;
+        this.jwtBlackListRepository = jwtBlackListRepository;
     }
 
     /**
@@ -49,7 +52,11 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         System.out.println("header : " + header);
         String token = request.getHeader(JwtProperties.HEADER_STRING)
                 .replace(JwtProperties.TOKEN_PREFIX, "");
-
+        boolean isBlackListToken = jwtBlackListRepository.existsByToken(token);
+        if(isBlackListToken){
+            chain.doFilter(request,response);
+            return;
+        }
         // 토큰 검증 (이게 인증이기 때문에 AuthenticationManager도 필요 없음)
         // 내가 SecurityContext에 집적접근해서 세션을 만들때 자동으로 UserDetailsService에 있는
         // loadByUsername이 호출됨.

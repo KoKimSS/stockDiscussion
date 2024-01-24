@@ -2,6 +2,7 @@ package com.kss.stockDiscussion.config;
 
 import com.kss.stockDiscussion.config.jwt.JwtAuthenticationFilter;
 import com.kss.stockDiscussion.config.jwt.JwtAuthorizationFilter;
+import com.kss.stockDiscussion.repository.jwtBlackListRepository.JwtBlackListRepository;
 import com.kss.stockDiscussion.repository.userRepository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,11 +21,12 @@ import org.springframework.security.web.SecurityFilterChain;
 @Slf4j
 @Configuration
 public class SecurityConfig {
-    private static final String[] userFilter = {"/user/**"};
+    private static final String[] userFilter = {"/user/**","/api/auth/log-out"};
     private static final String[] managerFilter = {"/manager/**"};
     private static final String[] adminFilter = {"/admin/**"};
     private final String loginURL = "/api/auth/log-in";
     private final UserRepository userRepository;
+    private final JwtBlackListRepository jwtBlackListRepository;
     private final CorsConfig corsConfig;
 
     @Bean
@@ -38,7 +40,8 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests(a -> {
                     try {
-                        a.antMatchers(userFilter).access("hasRole('ROLE_USER') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
+                        a
+                                .antMatchers(userFilter).access("hasRole('ROLE_USER') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
                                 .antMatchers(managerFilter).access("hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
                                 .antMatchers(adminFilter).access("hasRole('ROLE_ADMIN')")
                                 .anyRequest().permitAll();
@@ -58,7 +61,7 @@ public class SecurityConfig {
             http
                     .addFilter(corsConfig.corsFilter())
                     .addFilter(jwtAuthenticationFilter)
-                    .addFilter(new JwtAuthorizationFilter(authenticationManager, userRepository));
+                    .addFilter(new JwtAuthorizationFilter(authenticationManager, userRepository,jwtBlackListRepository));
         }
     }
 

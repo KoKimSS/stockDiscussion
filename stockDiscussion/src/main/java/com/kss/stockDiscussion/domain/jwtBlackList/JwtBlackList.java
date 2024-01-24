@@ -1,6 +1,7 @@
 package com.kss.stockDiscussion.domain.jwtBlackList;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
@@ -17,4 +18,10 @@ public class JwtBlackList {
 
     @Column(nullable = false, unique = true)
     private String token;
+
+
+    @Builder
+    private JwtBlackList(String token) {
+        this.token = token;
+    }
 }

@@ -1,10 +1,15 @@
 package com.kss.stockDiscussion.service.authService;
 
+import com.kss.stockDiscussion.common.ResponseCode;
+import com.kss.stockDiscussion.common.ResponseMessage;
+import com.kss.stockDiscussion.config.jwt.JwtProperties;
 import com.kss.stockDiscussion.domain.certification.Certification;
+import com.kss.stockDiscussion.domain.jwtBlackList.JwtBlackList;
 import com.kss.stockDiscussion.domain.user.Role;
 import com.kss.stockDiscussion.domain.user.User;
 import com.kss.stockDiscussion.provider.EmailProvider;
 import com.kss.stockDiscussion.repository.certificationRepository.CertificationRepository;
+import com.kss.stockDiscussion.repository.jwtBlackListRepository.JwtBlackListRepository;
 import com.kss.stockDiscussion.repository.userRepository.UserRepository;
 import com.kss.stockDiscussion.web.dto.request.auth.CheckCertificationRequestDto;
 import com.kss.stockDiscussion.web.dto.request.auth.EmailCertificationRequestDto;
@@ -16,10 +21,13 @@ import com.kss.stockDiscussion.web.dto.response.auth.EmailCheckResponseDto;
 import com.kss.stockDiscussion.web.dto.response.ResponseDto;
 import com.kss.stockDiscussion.web.dto.response.auth.SignUpResponseDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
 
 @Service
@@ -30,6 +38,7 @@ public class AuthServiceImpl implements AuthService{
     private final EmailProvider emailProvider;
     private final CertificationRepository certificationRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final JwtBlackListRepository jwtBlackListRepository;
     @Override
     public ResponseEntity<? super EmailCheckResponseDto> emailCheck(EmailCheckRequestDto dto) {
         try {
@@ -119,6 +128,18 @@ public class AuthServiceImpl implements AuthService{
             return ResponseDto.databaseError();
         }
         return SignUpResponseDto.success();
+    }
+
+    @Override
+    public ResponseEntity<?super ResponseDto> logOut(HttpServletRequest request) {
+        String token = request.getHeader(JwtProperties.HEADER_STRING)
+                .replace(JwtProperties.TOKEN_PREFIX, "");
+        boolean existsByToken = jwtBlackListRepository.existsByToken(token);
+        if(existsByToken) return ResponseDto.validationFail();
+        JwtBlackList jwtBlackList = JwtBlackList.builder().token(token).build();
+        jwtBlackListRepository.save(jwtBlackList);
+        ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
+        return ResponseEntity.status(HttpStatus.OK).body(responseBody);
     }
 
     private static boolean isDtoMatchCertification(String email, String certificationNumber, Certification certification) {

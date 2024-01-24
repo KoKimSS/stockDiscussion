@@ -13,6 +13,7 @@ public class ResponseDto {
     private String code;
     private String message;
 
+
     public ResponseDto() {
         this.code = ResponseCode.SUCCESS;
         this.message = ResponseMessage.SUCCESS;
