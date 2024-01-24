@@ -1,5 +1,6 @@
 package com.kss.stockDiscussion.config.auth;
 
+import com.kss.stockDiscussion.domain.user.Role;
 import com.kss.stockDiscussion.domain.user.User;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -19,19 +20,23 @@ public class PrincipalDetails implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(() -> String.valueOf(user.getRole()));
+        user.getRoleList().forEach(
+                role -> authorities.add(() -> role)
+        );
         return authorities;
     }
 
     @Override
     public String getPassword() {
+        System.out.println("패스워드는"+user.getPassword());
         return user.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return user.getName();
+        return user.getEmail();
     }
+
 
     @Override
     public boolean isAccountNonExpired() {

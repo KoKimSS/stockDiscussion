@@ -41,38 +41,21 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        Cookie[] cookies = request.getCookies();
-        Cookie JwtCookie = null;
-        log.info("JWT 토큰 검사");
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie != null) {
-                    if (cookie.getName().equals(JwtProperties.HEADER_STRING)) {
-                        log.info("JWT 토큰 있음");
-                        JwtCookie = cookie;
-                        break;
-                    }
-                }
-            }
-        }
-
-        if (JwtCookie == null) {
-            log.info("JWT 토큰 없음");
-            chain.doFilter(request, response);
-            return;
-        }else if(!JwtCookie.getValue().startsWith(JwtProperties.TOKEN_PREFIX_UTF8)){
-            log.info("JWT 토큰 PREFIX 이상");
+        String header = request.getHeader(JwtProperties.HEADER_STRING);
+        if (header == null || !header.startsWith(JwtProperties.TOKEN_PREFIX)) {
             chain.doFilter(request, response);
             return;
         }
-        String JwtValue = JwtCookie.getValue();
-        String token = JwtValue.replace(JwtProperties.TOKEN_PREFIX_UTF8, "");
+        System.out.println("header : " + header);
+        String token = request.getHeader(JwtProperties.HEADER_STRING)
+                .replace(JwtProperties.TOKEN_PREFIX, "");
 
         // 토큰 검증 (이게 인증이기 때문에 AuthenticationManager도 필요 없음)
         // 내가 SecurityContext에 집적접근해서 세션을 만들때 자동으로 UserDetailsService에 있는
         // loadByUsername이 호출됨.
         String email = JWT.require(Algorithm.HMAC512(JwtProperties.SECRET)).build().verify(token)
                 .getClaim("email").asString();
+        System.out.println("email = " + email);
 
         if (email != null) {
             Optional<User> userByMail = userRepository.findByEmail(email);

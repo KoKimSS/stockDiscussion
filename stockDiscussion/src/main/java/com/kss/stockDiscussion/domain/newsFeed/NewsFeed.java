@@ -15,6 +15,7 @@ public class NewsFeed {
 
     @Id
     @GeneratedValue
+    @Column(name = "news_feed_id")
     private Long id;
 
     @ManyToOne

@@ -2,19 +2,23 @@ package com.kss.stockDiscussion.domain.user;
 
 import com.kss.stockDiscussion.domain.baseEntity.BaseEntity;
 import com.kss.stockDiscussion.domain.follow.Follow;
+import com.kss.stockDiscussion.domain.like.Likes;
+import com.kss.stockDiscussion.domain.reply.Reply;
 import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString(of = {"id", "username", "age"})
+@ToString(of = {"id", "name","email","introduction","img_path" })
 @Getter
 public class User extends BaseEntity {
     @Id
     @GeneratedValue
+    @Column(name = "user_id")
     private Long id;
     private String email;
     private String password;
@@ -22,22 +26,31 @@ public class User extends BaseEntity {
     private String introduction;
     private String img_path;
 
-    @Enumerated(value = EnumType.STRING)
-    @Column(nullable = false)
-    private Role role;
+    private String roles; //USER, ADMIN
     @OneToMany(mappedBy = "following")
     private List<Follow> followers = new ArrayList<>();
 
     @OneToMany(mappedBy = "follower")
     private List<Follow> following = new ArrayList<>();
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+    private List<Reply> replies = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
+    private List<Likes> likesList = new ArrayList<>();
 
     @Builder
-    public User(String email, String password, String name, String introduction, String img_path, Role role) {
+    public User(String email, String password, String name, String introduction, String img_path) {
         this.email = email;
         this.password = password;
         this.name = name;
         this.introduction = introduction;
         this.img_path = img_path;
-        this.role = role;
+        this.roles = "USER";
+    }
+    public List<String> getRoleList() {
+        if (!this.roles.equals(null)) {
+            return Arrays.asList(this.roles.split(" "));
+        }
+        return new ArrayList<>();
     }
 }

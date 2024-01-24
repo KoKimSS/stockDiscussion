@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @EnableWebSecurity
@@ -22,7 +23,7 @@ public class SecurityConfig {
     private static final String[] userFilter = {"/user/**"};
     private static final String[] managerFilter = {"/manager/**"};
     private static final String[] adminFilter = {"/admin/**"};
-    private final String loginURL = "/api/login";
+    private final String loginURL = "/api/auth/log-in";
     private final UserRepository userRepository;
     private final CorsConfig corsConfig;
 
@@ -37,9 +38,9 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests(a -> {
                     try {
-                        a.antMatchers(userFilter).access("hasRole('USER') or hasRole('MANAGER') or hasRole('ADMIN')")
-                                .antMatchers(managerFilter).access("hasRole('MANAGER') or hasRole('ADMIN')")
-                                .antMatchers(adminFilter).access("hasRole('ADMIN')")
+                        a.antMatchers(userFilter).access("hasRole('ROLE_USER') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
+                                .antMatchers(managerFilter).access("hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
+                                .antMatchers(adminFilter).access("hasRole('ROLE_ADMIN')")
                                 .anyRequest().permitAll();
                     } catch (Exception e) {
                         throw new RuntimeException(e);

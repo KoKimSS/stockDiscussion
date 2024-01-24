@@ -1,6 +1,7 @@
 package com.kss.stockDiscussion.domain.poster;
 
-import com.kss.stockDiscussion.domain.like.Like;
+import com.kss.stockDiscussion.domain.like.Likes;
+import com.kss.stockDiscussion.domain.reply.Reply;
 import com.kss.stockDiscussion.domain.user.User;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -18,6 +19,7 @@ import java.util.List;
 public class Poster {
     @Id
     @GeneratedValue
+    @Column(name = "poster_id")
     private Long id;
 
     private String title;
@@ -27,5 +29,8 @@ public class Poster {
     private User owner;
 
     @OneToMany(mappedBy = "poster", cascade = CascadeType.ALL)
-    private List<Like> likes = new ArrayList<>();
+    private List<Likes> likes = new ArrayList<>();
+    @OneToMany(mappedBy = "poster", cascade = CascadeType.ALL)
+    private List<Reply> replies = new ArrayList<>();
+
 }

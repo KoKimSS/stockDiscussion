@@ -1,5 +1,15 @@
 package com.kss.stockDiscussion.domain.user;
 
 public enum Role {
-    ROLE_USER,ROLE_ADMIN
+    USER,ADMIN;
+
+    public static String toString(Role role) {
+        if(role==USER){
+            return "USER";
+        }
+        if (role == ADMIN) {
+            return "ADMIN";
+        }
+        return null;
+    }
 }

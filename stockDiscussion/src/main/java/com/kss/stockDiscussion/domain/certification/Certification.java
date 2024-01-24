@@ -2,6 +2,7 @@ package com.kss.stockDiscussion.domain.certification;
 
 import lombok.*;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -12,6 +13,7 @@ import javax.persistence.Id;
 public class Certification {
     @Id
     @GeneratedValue
+    @Column(name = "certification_id")
     Long id;
 
     String email;

@@ -109,7 +109,7 @@ public class AuthServiceImpl implements AuthService{
                     .name(dto.getName())
                     .introduction(dto.getIntroduction())
                     .img_path(dto.getImgPath())
-                    .role(Role.ROLE_USER).build();
+                    .build();
 
             userRepository.save(user);
             certificationRepository.deleteByEmail(email);

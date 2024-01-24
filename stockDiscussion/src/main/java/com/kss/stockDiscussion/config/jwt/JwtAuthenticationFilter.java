@@ -10,6 +10,7 @@ import org.springframework.security.authentication.AuthenticationServiceExceptio
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.FilterChain;
@@ -37,51 +38,51 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         System.out.println("JwtAuthenticationFilter : 로그인 시도중");
 
-
         ObjectMapper om = new ObjectMapper();
         LoginDto loginDto = null;
 
         try {
             loginDto = om.readValue(request.getInputStream(), LoginDto.class);
+            System.out.println("LoginDto: " + loginDto);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.err.println("Error reading LoginDto from request: " + e.getMessage());
+            throw new AuthenticationServiceException("Error reading LoginDto from request", e);
         }
-        System.out.println(loginDto);
-
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword());
 
         System.out.println("JwtAuthenticationFilter : 토큰생성완료");
         System.out.println(authenticationToken);
 
-        //PrincipalDetailsService의 loadUserByUsername() 실행
-        //DB에 있는 username 과 password 가 일치한다.
-        Authentication authentication =
-                authenticationManager.authenticate(authenticationToken);
+        try {
+            // PrincipalDetailsService's loadUserByUsername() is executed here
+            Authentication authentication = authenticationManager.authenticate(authenticationToken);
+            System.out.println("authentication 실행 완료?");
+            PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+            System.out.println("principalDetails = " + principalDetails.getUser());
 
-        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
-        System.out.println("principalDetails = " + principalDetails.getUser());
+            if (this.postOnly && !request.getMethod().equals("POST")) {
+                throw new AuthenticationServiceException("Authentication method not supported: " + request.getMethod());
+            }
 
-        if (this.postOnly && !request.getMethod().equals("POST")) {
-            throw new AuthenticationServiceException("Authentication method not supported: " + request.getMethod());
+            String username = obtainUsername(request);
+            username = (username != null) ? username.trim() : "";
+            String password = obtainPassword(request);
+            password = (password != null) ? password : "";
+            System.out.println(username+" "+password);
+            UsernamePasswordAuthenticationToken authRequest = UsernamePasswordAuthenticationToken.unauthenticated(username, password);
+
+            // Allow subclasses to set the "details" property
+            setDetails(request, authRequest);
+            return authentication;
+
+        } catch (AuthenticationException e) {
+            System.err.println("Authentication failed: " + e.getMessage());
+            throw e;
         }
-        String username = obtainUsername(request);
-        username = (username != null) ? username.trim() : "";
-        String password = obtainPassword(request);
-        password = (password != null) ? password : "";
-        UsernamePasswordAuthenticationToken authRequest = UsernamePasswordAuthenticationToken.unauthenticated(username,
-                password);
-        // Allow subclasses to set the "details" property
-        setDetails(request, authRequest);
-        return authentication;
-        /**
-         *  1. username, password 를 받은 후
-         *  2. 정상인지 로그인 시도를 해본다  this.getAuthenticationManager().authenticate(authRequest)
-         *     PrincipalDetailsService 호출 loadUserByUsername() 함수 실행
-         *  3. PrincipalDetails 를 세션에 담고
-         *  4. JWT token 을 만들어서 응답해주면 됨
-         */
     }
+
+
     /**
      * 이 함수( attemptAuthentication ) 실행 후 인증이 정상적으로 이루어 지면 successfulAuthentication 함수가 실행 됨
      * JWT 토큰을 만들어 response 에 JWT 토큰을 담아 사용자에게 보냄
