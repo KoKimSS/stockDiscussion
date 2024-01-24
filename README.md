@@ -7,7 +7,6 @@
 컴포즈 파일이 존재하는 디렉터리에서 실행합니다.
 
 ```bash
-bashCopy code
 docker-compose up -d
 ```
 
@@ -16,7 +15,6 @@ docker-compose up -d
 다른 컴포즈 파일을 사용하려면 파일 경로를 지정합니다.
 
 ```bash
-bashCopy code
 docker-compose -f 컴포즈파일_경로 up
 ```
 
@@ -25,7 +23,6 @@ docker-compose -f 컴포즈파일_경로 up
 컴포즈를 백그라운드에서 실행합니다.
 
 ```bash
-bashCopy code
 docker-compose up -d
 ```
 
@@ -34,7 +31,6 @@ docker-compose up -d
 특정 서비스의 컨테이너 개수를 조정합니다.
 
 ```bash
-bashCopy code
 docker-compose --scale 서비스_명=서비스수 up
 ```
 
@@ -45,7 +41,6 @@ docker-compose --scale 서비스_명=서비스수 up
 모든 컴포즈 컨테이너를 종료하고 삭제합니다.
 
 ```bash
-bashCopy code
 docker-compose down
 ```
 
@@ -56,7 +51,6 @@ docker-compose down
 모든 컴포즈 컨테이너를 정지합니다.
 
 ```bash
-bashCopy code
 docker-compose stop
 ```
 
@@ -65,7 +59,6 @@ docker-compose stop
 컴포즈로 실행 중인 컨테이너의 상태를 확인합니다.
 
 ```bash
-bashCopy code
 docker-compose ps
 ```
 
@@ -76,7 +69,6 @@ docker-compose ps
 특정 서비스의 로그를 확인합니다.
 
 ```bash
-bashCopy code
 docker-compose logs 서비스_이름 -f
 ```
 
@@ -91,7 +83,6 @@ docker-compose logs 서비스_이름 -f
 서비스에 지정된 컨테이너를 실행합니다.
 
 ```bash
-bashCopy code
 docker-compose run 서비스_명
 ```
 
@@ -100,7 +91,6 @@ docker-compose run 서비스_명
 서비스에 지정된 컨테이너를 시작, 정지, 일시정지, 재개합니다.
 
 ```bash
-bashCopy code
 docker-compose start 서비스_명
 docker-compose stop 서비스_명
 docker-compose pause 서비스_명
@@ -112,6 +102,5 @@ docker-compose unpause 서비스_명
 컴포즈로 실행 중인 서비스의 공개된 포트를 표시합니다.
 
 ```bash
-bashCopy code
 docker-compose port
 ```
