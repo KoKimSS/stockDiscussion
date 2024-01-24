@@ -2,10 +2,7 @@ package com.kss.stockDiscussion.domain.user;
 
 import com.kss.stockDiscussion.domain.baseEntity.BaseEntity;
 import com.kss.stockDiscussion.domain.follow.Follow;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -33,4 +30,14 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "follower")
     private List<Follow> following = new ArrayList<>();
+
+    @Builder
+    public User(String email, String password, String name, String introduction, String img_path, Role role) {
+        this.email = email;
+        this.password = password;
+        this.name = name;
+        this.introduction = introduction;
+        this.img_path = img_path;
+        this.role = role;
+    }
 }

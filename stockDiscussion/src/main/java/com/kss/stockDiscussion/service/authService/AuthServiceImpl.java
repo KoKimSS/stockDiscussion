@@ -1,17 +1,26 @@
 package com.kss.stockDiscussion.service.authService;
 
 import com.kss.stockDiscussion.domain.certification.Certification;
+import com.kss.stockDiscussion.domain.user.Role;
+import com.kss.stockDiscussion.domain.user.User;
 import com.kss.stockDiscussion.provider.EmailProvider;
 import com.kss.stockDiscussion.repository.certificationRepository.CertificationRepository;
 import com.kss.stockDiscussion.repository.userRepository.UserRepository;
-import com.kss.stockDiscussion.web.dto.request.EmailCertificationRequestDto;
-import com.kss.stockDiscussion.web.dto.request.EmailCheckRequestDto;
-import com.kss.stockDiscussion.web.dto.response.EmailCertificationResponseDto;
-import com.kss.stockDiscussion.web.dto.response.EmailCheckResponseDto;
+import com.kss.stockDiscussion.web.dto.request.auth.CheckCertificationRequestDto;
+import com.kss.stockDiscussion.web.dto.request.auth.EmailCertificationRequestDto;
+import com.kss.stockDiscussion.web.dto.request.auth.EmailCheckRequestDto;
+import com.kss.stockDiscussion.web.dto.request.auth.SignUpRequestDto;
+import com.kss.stockDiscussion.web.dto.response.auth.CheckCertificationResponseDto;
+import com.kss.stockDiscussion.web.dto.response.auth.EmailCertificationResponseDto;
+import com.kss.stockDiscussion.web.dto.response.auth.EmailCheckResponseDto;
 import com.kss.stockDiscussion.web.dto.response.ResponseDto;
+import com.kss.stockDiscussion.web.dto.response.auth.SignUpResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +29,7 @@ public class AuthServiceImpl implements AuthService{
     private final UserRepository userRepository;
     private final EmailProvider emailProvider;
     private final CertificationRepository certificationRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
     @Override
     public ResponseEntity<? super EmailCheckResponseDto> emailCheck(EmailCheckRequestDto dto) {
         try {
@@ -39,9 +49,12 @@ public class AuthServiceImpl implements AuthService{
             String email = dto.getEmail();
             // email 이 존재한다면?을 해야 할까?
             String certificationNumber = getCertificationNumber();
+            Optional<Certification> existEmail = certificationRepository.findByEmail(email);
+            if(existEmail.isPresent()){
+                certificationRepository.delete(existEmail.get());
+            }
             boolean isSuccess = emailProvider.sendCertificationMail(email, certificationNumber);
             if(!isSuccess) return EmailCertificationResponseDto.mailSendFail();
-
             Certification certification = Certification.builder().email(email).certificationNumber(certificationNumber).build();
             certificationRepository.save(certification);
         } catch (Exception exception) {
@@ -49,6 +62,67 @@ public class AuthServiceImpl implements AuthService{
             return ResponseDto.databaseError();
         }
         return EmailCertificationResponseDto.success();
+    }
+
+    @Override
+    public ResponseEntity<? super CheckCertificationResponseDto> checkCertification(CheckCertificationRequestDto dto) {
+        try {
+
+            String email = dto.getEmail();
+            String certificationNumber = dto.getCertificationNumber();
+
+            Optional<Certification> byUserEmail = certificationRepository.findByEmail(email);
+            if(!byUserEmail.isPresent()) return CheckCertificationResponseDto.certificationFail();
+
+            Certification certification = byUserEmail.get();
+            boolean isMatch = isDtoMatchCertification(email, certificationNumber, certification);
+            if(!isMatch) return CheckCertificationResponseDto.certificationFail();
+
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            return ResponseDto.databaseError();
+        }
+        return CheckCertificationResponseDto.success();
+    }
+
+    @Override
+    public ResponseEntity<? super SignUpResponseDto> singUp(SignUpRequestDto dto) {
+
+        try {
+            String email = dto.getEmail();
+            boolean existsByEmail = userRepository.existsByEmail(email);
+            if(existsByEmail) return SignUpResponseDto.duplicateEmail();
+
+            String certificationNumber = dto.getCertificationNumber();
+            Optional<Certification> optionalCertificationByEmail = certificationRepository.findByEmail(email);
+
+            if(!optionalCertificationByEmail.isPresent()) SignUpResponseDto.certificationFail();
+
+            Certification certificationByEmail = optionalCertificationByEmail.get();
+            if(!isDtoMatchCertification(email,certificationNumber,certificationByEmail))
+                return SignUpResponseDto.certificationFail();
+
+            String encodedPassword = bCryptPasswordEncoder.encode(dto.getPassword());
+            User user = User.builder()
+                    .email(email)
+                    .password(encodedPassword)
+                    .name(dto.getName())
+                    .introduction(dto.getIntroduction())
+                    .img_path(dto.getImgPath())
+                    .role(Role.ROLE_USER).build();
+
+            userRepository.save(user);
+            certificationRepository.deleteByEmail(email);
+
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            return ResponseDto.databaseError();
+        }
+        return SignUpResponseDto.success();
+    }
+
+    private static boolean isDtoMatchCertification(String email, String certificationNumber, Certification certification) {
+        return certification.getEmail().equals(email) && certificationNumber.equals(certification.getCertificationNumber());
     }
 
     private String getCertificationNumber() {

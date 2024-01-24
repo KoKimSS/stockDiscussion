@@ -4,15 +4,12 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kss.stockDiscussion.config.auth.PrincipalDetails;
 import com.kss.stockDiscussion.domain.user.LoginDto;
-import com.kss.stockDiscussion.domain.user.User;
 import lombok.RequiredArgsConstructor;
-import com.auth0.jwt.JWT;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.FilterChain;
@@ -21,8 +18,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Date;
-
-import static org.springframework.security.config.Elements.JWT;
 
 
 /**

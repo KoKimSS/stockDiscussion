@@ -1,4 +1,4 @@
-package com.kss.stockDiscussion.web.dto.request;
+package com.kss.stockDiscussion.web.dto.request.auth;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

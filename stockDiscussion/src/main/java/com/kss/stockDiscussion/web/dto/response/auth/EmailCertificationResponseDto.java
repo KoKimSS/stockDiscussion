@@ -1,13 +1,14 @@
-package com.kss.stockDiscussion.web.dto.response;
+package com.kss.stockDiscussion.web.dto.response.auth;
 
 import com.kss.stockDiscussion.common.ResponseCode;
 import com.kss.stockDiscussion.common.ResponseMessage;
+import com.kss.stockDiscussion.web.dto.response.ResponseDto;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 @Data
-public class EmailCertificationResponseDto extends ResponseDto{
+public class EmailCertificationResponseDto extends ResponseDto {
     private EmailCertificationResponseDto() {
         super();
     }

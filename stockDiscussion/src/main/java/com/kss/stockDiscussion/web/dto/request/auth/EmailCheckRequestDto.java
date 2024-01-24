@@ -1,5 +1,6 @@
-package com.kss.stockDiscussion.web.dto.request;
+package com.kss.stockDiscussion.web.dto.request.auth;
 
+import com.kss.stockDiscussion.web.dto.request.RequestDto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
