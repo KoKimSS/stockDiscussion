@@ -1,3 +1,4 @@
+
 spring:
   profiles:
     include:
@@ -8,3 +9,17 @@ spring:
     hiddenmethod:
       filter:
         enabled: true
+  #Gmail 설정
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: seungsu8826@gmail.com
+    password: oubt cmyf guzg hbmg
+    properties:
+      mail:
+        smtp:
+          auth: true
+          timeout : 5000 # Socket Read Timeout 시간(ms) (기본값 : 무한대)
+          starttls :
+            enable : true
+
