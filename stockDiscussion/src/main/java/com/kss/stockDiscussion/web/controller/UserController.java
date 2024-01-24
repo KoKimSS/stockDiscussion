@@ -3,7 +3,9 @@ package com.kss.stockDiscussion.web.controller;
 import com.kss.stockDiscussion.service.userService.UserService;
 import com.kss.stockDiscussion.service.userService.UserServiceImpl;
 import com.kss.stockDiscussion.web.dto.request.user.UpdatePasswordRequestDto;
+import com.kss.stockDiscussion.web.dto.request.user.UpdateProfileRequestDto;
 import com.kss.stockDiscussion.web.dto.response.user.UpdatePasswordResponseDto;
+import com.kss.stockDiscussion.web.dto.response.user.UpdateProfileResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,9 +30,9 @@ public class UserController {
     }
 
     @PostMapping("/update-profile")
-    ResponseEntity<? super UpdatePasswordResponseDto> updateProfile(
-            @RequestBody@Valid UpdatePasswordRequestDto requestBody) {
-        ResponseEntity<? super UpdatePasswordResponseDto> response = userService.updateProfile(requestBody);
+    ResponseEntity<? super UpdateProfileResponseDto> updateProfile(
+            @RequestBody@Valid UpdateProfileRequestDto requestBody) {
+        ResponseEntity<? super UpdateProfileResponseDto> response = userService.updateProfile(requestBody);
         return response;
     }
 
