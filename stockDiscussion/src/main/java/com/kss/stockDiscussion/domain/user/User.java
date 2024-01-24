@@ -24,7 +24,7 @@ public class User extends BaseEntity {
     private String password;
     private String name;
     private String introduction;
-    private String img_path;
+    private String imgPath;
 
     private String roles; //USER, ADMIN
     @OneToMany(mappedBy = "following")
@@ -39,12 +39,12 @@ public class User extends BaseEntity {
     private List<Likes> likesList = new ArrayList<>();
 
     @Builder
-    public User(String email, String password, String name, String introduction, String img_path) {
+    public User(String email, String password, String name, String introduction, String imgPath) {
         this.email = email;
         this.password = password;
         this.name = name;
         this.introduction = introduction;
-        this.img_path = img_path;
+        this.imgPath = imgPath;
         this.roles = "USER";
     }
     public List<String> getRoleList() {
@@ -52,5 +52,15 @@ public class User extends BaseEntity {
             return Arrays.asList(this.roles.split(" "));
         }
         return new ArrayList<>();
+    }
+
+    public void updatePassword(String password){
+        this.password = password;
+    }
+
+    public void updateProfile(String name ,String imgPath, String introduction){
+        this.name=name;
+        this.imgPath =imgPath;
+        this.introduction=introduction;
     }
 }
