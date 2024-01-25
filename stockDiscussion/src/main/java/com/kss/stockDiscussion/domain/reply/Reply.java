@@ -3,10 +3,7 @@ package com.kss.stockDiscussion.domain.reply;
 import com.kss.stockDiscussion.domain.baseEntity.BaseTimeEntity;
 import com.kss.stockDiscussion.domain.poster.Poster;
 import com.kss.stockDiscussion.domain.user.User;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -27,4 +24,11 @@ public class Reply extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User owner;
+
+    @Builder
+    public Reply(String contents, Poster poster, User owner) {
+        this.contents = contents;
+        this.poster = poster;
+        this.owner = owner;
+    }
 }

@@ -13,26 +13,27 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class FollowServiceImpl implements FollowService{
+public class FollowServiceImpl implements FollowService {
 
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
+
     @Override
     public ResponseEntity<? super StartFollowResponseDto> follow(StartFollowRequestDto dto) {
+        try {
+            Long followingId = dto.getFollowingId();
+            Long followerId = dto.getFollowerId();
+            User user = JwtUtil.findUserFromAuth();
+            if (user.getId() != followerId) {
+                return StartFollowResponseDto.certificationFail();
+            }
 
-        Long followingId = dto.getFollowingId();
-        Long followerId = dto.getFollowerId();
-        User user = JwtUtil.findUserFromAuth();
-        if(user.getId()!=followerId){
-            return StartFollowResponseDto.certificationFail();
-        }
-        try{
             User follower = userRepository.findById(followerId).get();
             User following = userRepository.findById(followingId).get();
 
             Follow follow = Follow.builder().follower(follower).following(following).build();
             followRepository.save(follow);
-        }catch (Exception exception){
+        } catch (Exception exception) {
             exception.printStackTrace();
             StartFollowResponseDto.databaseError();
         }

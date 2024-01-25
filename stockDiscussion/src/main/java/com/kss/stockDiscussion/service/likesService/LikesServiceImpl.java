@@ -32,33 +32,25 @@ public class LikesServiceImpl implements LikesService{
 
     @Override
     public ResponseEntity<? super CreateLikesResponseDto> createLikes(CreateLikesRequestDto dto) {
-        LikeType likeType = dto.getLikeType();
-        Long posterId = dto.getPosterId(); //@NotBlank 이다
-        Long replyId = dto.getReplyId();
+
         try {
+            LikeType likeType = dto.getLikeType();
+            Long posterId = dto.getPosterId(); //@NotBlank 이다
+            Long replyId = dto.getReplyId();
             if (likeType == LikeType.REPLY && replyId == null) return CreateLikesResponseDto.validationFail();
 
             Long loginId = JwtUtil.findUserFromAuth().getId();
             Long requestUserId = dto.getUserId();
             if (loginId != requestUserId) return CreateLikesResponseDto.certificationFail();
-            Optional<User> optionalUser = userRepository.findById(loginId);
-
-            if(!optionalUser.isPresent()) return CreateLikesResponseDto.databaseError();
-            User requestUser = optionalUser.get();
-
-            Optional<Poster> optionalPoster = posterRepository.findById(posterId);
-            if(!optionalPoster.isPresent()) return CreateLikesResponseDto.databaseError();
-            Poster requestPoster = optionalPoster.get();
+            User requestUser = userRepository.findById(loginId).get();
+            Poster requestPoster =  posterRepository.findById(posterId).get();
 
             LikesBuilder likesBuilder = builder().likeType(likeType)
                     .user(requestUser)
                     .poster(requestPoster);
 
             if(likeType == LikeType.REPLY){
-                Optional<Reply> optionalReply = replyRepository.findById(replyId);
-                if(!optionalReply.isPresent()) return CreateLikesResponseDto.databaseError();
-
-                Reply requestReply = optionalReply.get();
+                Reply requestReply = replyRepository.findById(replyId).get();
                 likesBuilder.reply(requestReply);
             }
             Likes newLikes = likesBuilder.build();
