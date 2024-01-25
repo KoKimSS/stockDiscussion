@@ -1,9 +1,7 @@
 package com.kss.stockDiscussion.web.controller;
 
 import com.kss.stockDiscussion.service.newsFeedService.NewsFeedService;
-import com.kss.stockDiscussion.web.dto.request.newsFeed.GetFollowingNewsFeedRequestDto;
 import com.kss.stockDiscussion.web.dto.request.newsFeed.GetMyNewsFeedRequestDto;
-import com.kss.stockDiscussion.web.dto.response.newsFeed.GetFollowingNewsFeedResponseDto;
 import com.kss.stockDiscussion.web.dto.response.newsFeed.GetMyNewsFeedResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -28,11 +26,4 @@ public class NewsFeedController {
         return response;
     }
 
-    @GetMapping("/followingNewsFeed")
-    ResponseEntity<? super GetFollowingNewsFeedResponseDto> getFollowingNewsFeed(
-            @Valid@RequestBody GetFollowingNewsFeedRequestDto requestBody
-    ) {
-        ResponseEntity<? super GetFollowingNewsFeedResponseDto> response = newsFeedService.getFollowingNewsFeeds(requestBody);
-        return response;
-    }
 }

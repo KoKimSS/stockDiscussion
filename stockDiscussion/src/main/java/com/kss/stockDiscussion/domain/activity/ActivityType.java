@@ -1,4 +1,4 @@
-package com.kss.stockDiscussion.domain.newsFeed;
+package com.kss.stockDiscussion.domain.activity;
 
 public enum ActivityType {
     POST("글 작성"),

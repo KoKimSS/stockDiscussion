@@ -1,7 +1,7 @@
 package com.kss.stockDiscussion.repository.newsFeedRepository;
 
-import com.kss.stockDiscussion.domain.newsFeed.ActivityType;
 import com.kss.stockDiscussion.domain.newsFeed.NewsFeed;
+import com.kss.stockDiscussion.domain.newsFeed.NewsFeedType;
 import com.kss.stockDiscussion.domain.poster.Poster;
 import com.kss.stockDiscussion.domain.user.User;
 import com.kss.stockDiscussion.repository.posterRepository.PosterRepository;
@@ -15,14 +15,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-
-import java.util.List;
-
-import static com.kss.stockDiscussion.domain.newsFeed.ActivityType.*;
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -30,105 +22,67 @@ import static org.junit.jupiter.api.Assertions.*;
 class NewsFeedRepositoryTest {
 
     @Autowired
-    private NewsFeedRepository newsFeedRepository;
+    NewsFeedRepository newsFeedRepository;
     @Autowired
     private UserRepository userRepository;
     @Autowired
     private PosterRepository posterRepository;
 
-    @DisplayName("연관된 유저 아이디로 뉴스피드 찾기")
+    //    MY_RELY("내 글에 리플을 담"),
+    //    MY_LIKE("내 글에 좋아요를 누름"),
+    //    MY_FOLLOW("나를 팔로우 함"),
+    //    FOLLOWING_REPLY("팔로잉이 어떤 글에 리플을 담"),
+    //    FOLLOWING_LIKE("팔로잉이 어떤 글에 좋아요를 함"),
+    //    FOLLOWING_FOLLOW("팔로잉이 누군가를 팔로우 함"),
+    //    FOLLOWING_POST("팔로잉이 글을 적음");
+    @DisplayName("유저 아이디로 뉴스피드 페이지를 찾는다.")
     @Test
-    public void findByRelatedUserId() throws Exception {
+    public void findByUserId() throws Exception {
         //given
-        int page = 0;
-        int size = 2;
-        Pageable pageable = PageRequest.of(page, size);
+        User user = User.builder().name("유저").build();
+        User activityUser1 = User.builder().name("활동유저1").build();
+        User activityUser2 = User.builder().name("활동유저2").build();
+        User activityUser3 = User.builder().name("활동유저3").build();
+        userRepository.saveAll(asList(user, activityUser1, activityUser2, activityUser3));
 
-        User relatedUser = User.builder().name("relatedUser").build();
-        User user1 = User.builder().name("user1").build();
-        User user2 = User.builder().name("user2").build();
-        User user3 = User.builder().name("user3").build();
-        userRepository.saveAll(asList(relatedUser,user1,user2,user3));
-        Poster poster = Poster.builder().owner(relatedUser)
-                .title("poster").build();
+        Poster userPoster = Poster.builder().owner(user)
+                .title("userPoster").build();
+        Poster activityUserPoster = Poster.builder().owner(activityUser1)
+                .title("activityUserPoster").build();
+        posterRepository.saveAll(asList(userPoster, activityUserPoster));
 
-        posterRepository.save(poster);
-        // 유저1 이 관련유저의 글에 댓글을 담
-        // 유저2 이 관련유저의 글에 좋아요를 누름
-        // 유저3 이 관련유저를 팔로우 함
-        NewsFeed replyNewsFeed = NewsFeed.builder().relatedPoster(poster)
-                .activityUser(user1)
-                .relatedUser(relatedUser)
-                .activityType(REPLY).build();
-        NewsFeed likeNewsFeed = NewsFeed.builder().relatedPoster(poster)
-                .activityUser(user2)
-                .relatedUser(relatedUser)
-                .activityType(LIKE).build();
-        NewsFeed followNewsFeed = NewsFeed.builder()
-                .activityUser(user3)
-                .relatedUser(relatedUser)
-                .activityType(FOLLOW).build();
-
-        newsFeedRepository.saveAll(asList(replyNewsFeed,likeNewsFeed,followNewsFeed));
-
-
+        NewsFeed newsFeed_MY_REPLY = NewsFeed.builder().user(user)
+                .activityUser(activityUser1)
+                .newsFeedType(NewsFeedType.MY_RELY)
+                .relatedPoster(userPoster).build();
+        NewsFeed newsFeed_MY_LIKE = NewsFeed.builder().user(user)
+                .activityUser(activityUser1)
+                .newsFeedType(NewsFeedType.MY_LIKE)
+                .relatedPoster(userPoster).build();
+        NewsFeed newsFeed_MY_FOLLOW = NewsFeed.builder().user(user)
+                .activityUser(activityUser1)
+                .newsFeedType(NewsFeedType.MY_FOLLOW).build();
+        NewsFeed newsFeed_FOLLOWING_REPLY = NewsFeed.builder().user(user)
+                .activityUser(activityUser1)
+                .newsFeedType(NewsFeedType.FOLLOWING_REPLY)
+                .relatedUser(activityUserPoster.getOwner())
+                .relatedPoster(activityUserPoster).build();
         //when
-        Page<NewsFeed> byFollowingId = newsFeedRepository.findByRelatedUserId(relatedUser.getId(),pageable);
+
+        newsFeedRepository.saveAll(asList(newsFeed_MY_REPLY, newsFeed_MY_LIKE, newsFeed_MY_FOLLOW, newsFeed_FOLLOWING_REPLY));
+        int size = 2;
+        Pageable pageable1 = PageRequest.of(0, size);
+        Pageable pageable2 = PageRequest.of(1, size);
+        Page<NewsFeed> byUserId1 = newsFeedRepository.findByUserId(user.getId(), pageable1);
+        Page<NewsFeed> byUserId2 = newsFeedRepository.findByUserId(user.getId(), pageable2);
 
         //then
-        //시간 순서대로 paging 되기 때문에 먼저 저장한 reply, like 가 첫번째 페이지에 나와야 한다
-        //총 개수는 3개
-        Assertions.assertThat(byFollowingId.getContent()).containsExactlyInAnyOrder(replyNewsFeed, likeNewsFeed);
-        Assertions.assertThat(byFollowingId.getTotalElements()).isEqualTo(3);
+        Assertions.assertThat(byUserId1.getTotalElements()).isEqualTo(4);
+        Assertions.assertThat(byUserId1.getContent()).containsExactly(newsFeed_MY_REPLY, newsFeed_MY_LIKE);
+        Assertions.assertThat(byUserId2.getTotalElements()).isEqualTo(4);
+        Assertions.assertThat(byUserId2.getContent()).containsExactly(newsFeed_MY_FOLLOW, newsFeed_FOLLOWING_REPLY);
+
+
     }
-
-    @DisplayName("활동 유저 리스트로 모든 NewsFeed 를 가져옴")
-    @Test
-    public void findByActivityUserIn() throws Exception {
-        //given
-        int page = 0;
-        int size = 2;
-        Pageable pageable = PageRequest.of(page, size);
-        User createPosterUser = User.builder().name("createPosterUser").build();
-        User user1 = User.builder().name("user1").build();
-        User user2 = User.builder().name("user2").build();
-        User user3 = User.builder().name("user3").build();
-        List<User> userList = asList(createPosterUser, user1, user2, user3);
-        userRepository.saveAll(userList);
-        Poster poster = Poster.builder().owner(createPosterUser)
-                .title("poster").build();
-
-        posterRepository.save(poster);
-        // 유저1 이 관련유저의 글에 댓글을 담
-        // 유저2 이 관련유저의 글에 좋아요를 누름
-        // 유저3 이 관련유저를 팔로우 함
-        NewsFeed postNewsFeed = NewsFeed.builder().relatedPoster(poster)
-                .activityUser(createPosterUser)
-                .activityType(POST).build();
-        NewsFeed replyNewsFeed = NewsFeed.builder().relatedPoster(poster)
-                .activityUser(user1)
-                .relatedUser(createPosterUser)
-                .activityType(REPLY).build();
-        NewsFeed likeNewsFeed = NewsFeed.builder().relatedPoster(poster)
-                .activityUser(user2)
-                .relatedUser(createPosterUser)
-                .activityType(LIKE).build();
-        NewsFeed followNewsFeed = NewsFeed.builder()
-                .activityUser(user3)
-                .relatedUser(user1)
-                .activityType(FOLLOW).build();
-
-        newsFeedRepository.saveAll(asList(postNewsFeed,replyNewsFeed,likeNewsFeed,followNewsFeed));
-
-        //when
-        Page<NewsFeed> byActivityUserIn = newsFeedRepository.findByActivityUserIn(userList, pageable);
-
-        List<NewsFeed> contents = byActivityUserIn.getContent();
-        long totalElements = byActivityUserIn.getTotalElements();
-        //then
-        Assertions.assertThat(contents).containsExactlyInAnyOrder(postNewsFeed, replyNewsFeed);
-        Assertions.assertThat(totalElements).isEqualTo(4);
-    }
-
 
 }

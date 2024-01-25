@@ -15,8 +15,8 @@ public class CreateLikesResponseDto extends ResponseDto {
         super();
     }
 
-    public static ResponseEntity<StartFollowResponseDto> success() {
-        StartFollowResponseDto responseBody = new StartFollowResponseDto();
+    public static ResponseEntity<CreateLikesResponseDto> success() {
+        CreateLikesResponseDto responseBody = new CreateLikesResponseDto();
         return ResponseEntity.status(HttpStatus.OK).body(responseBody);
     }
 

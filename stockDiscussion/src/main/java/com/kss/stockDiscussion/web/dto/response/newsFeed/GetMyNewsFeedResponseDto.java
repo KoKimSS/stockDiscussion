@@ -1,7 +1,6 @@
 package com.kss.stockDiscussion.web.dto.response.newsFeed;
 
 
-import com.kss.stockDiscussion.domain.newsFeed.NewsFeed;
 import com.kss.stockDiscussion.web.dto.response.ResponseDto;
 import lombok.Getter;
 import org.springframework.data.domain.Page;
