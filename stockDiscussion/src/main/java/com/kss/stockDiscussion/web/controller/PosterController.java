@@ -28,10 +28,9 @@ public class PosterController {
     }
 
     @PostMapping("/get-poster")
-    ResponseEntity<?super CreatePosterResponseDto> getPoster(
-            @Valid@RequestBody CreatePosterRequestDto requestBody
-    ){
-        ResponseEntity<? super CreatePosterResponseDto> response = posterService.createPoster(requestBody);
-        return response;
+    ResponseEntity getPoster(
+
+    ) {
+        return null;
     }
 }

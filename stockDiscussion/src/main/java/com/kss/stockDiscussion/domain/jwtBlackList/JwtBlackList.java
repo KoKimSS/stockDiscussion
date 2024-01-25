@@ -20,7 +20,6 @@ public class JwtBlackList extends BaseTimeEntity {
     @Column(nullable = false, unique = true)
     private String token;
 
-
     @Builder
     private JwtBlackList(String token) {
         this.token = token;

@@ -16,11 +16,6 @@ import javax.validation.Valid;
 public class UserController {
     private final UserService userService;
 
-    @RequestMapping("user")
-    String roleUserTest() {
-        return "Role_User";
-    }
-
     @PostMapping("/update-password")
     ResponseEntity<? super UpdatePasswordResponseDto> updatePassword(
             @RequestBody@Valid UpdatePasswordRequestDto requestBody) {

@@ -8,8 +8,8 @@ import javax.persistence.*;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString(of = {"id"})
 @Getter
+@EqualsAndHashCode(of = {"id"})
 public class Follow extends BaseTimeEntity {
     @Id
     @GeneratedValue
@@ -28,4 +28,5 @@ public class Follow extends BaseTimeEntity {
         this.follower = follower;
         this.following = following;
     }
+
 }

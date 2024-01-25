@@ -1,6 +1,7 @@
 package com.kss.stockDiscussion.domain.user;
 
 import com.kss.stockDiscussion.domain.baseEntity.BaseEntity;
+import com.kss.stockDiscussion.domain.baseEntity.BaseTimeEntity;
 import com.kss.stockDiscussion.domain.follow.Follow;
 import com.kss.stockDiscussion.domain.like.Likes;
 import com.kss.stockDiscussion.domain.reply.Reply;
@@ -11,11 +12,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+
 @Entity
+@Table(name = "\"user\"")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString(of = {"id", "name","email","introduction","img_path" })
+@EqualsAndHashCode(of = {"id","email","password","name","introduction","imgPath","roles"})
 @Getter
-public class User extends BaseEntity {
+public class User extends BaseTimeEntity {
     @Id
     @GeneratedValue
     @Column(name = "user_id")

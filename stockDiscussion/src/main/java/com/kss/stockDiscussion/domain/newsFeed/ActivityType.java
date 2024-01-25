@@ -2,8 +2,11 @@ package com.kss.stockDiscussion.domain.newsFeed;
 
 public enum ActivityType {
     POST("글 작성"),
-    COMMENT("댓글 작성"),
-    FOLLOW("팔로우");
+    REPLY("댓글 작성"),
+    FOLLOW("팔로우"),
+    LIKE("글 좋아요 누름");
+
+
 
     private final String displayName;
 
