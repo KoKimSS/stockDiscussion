@@ -2,8 +2,10 @@ package com.kss.stockDiscussion.domain.like;
 
 import com.kss.stockDiscussion.domain.baseEntity.BaseTimeEntity;
 import com.kss.stockDiscussion.domain.poster.Poster;
+import com.kss.stockDiscussion.domain.reply.Reply;
 import com.kss.stockDiscussion.domain.user.User;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -27,5 +29,18 @@ public class Likes extends BaseTimeEntity {
     @JoinColumn(name = "poster_id")
     private Poster poster;  // 예시: 글에 대한 좋아요
 
-    private boolean state;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reply_id")
+    private Reply reply;
+
+    @Enumerated(EnumType.STRING)
+    private LikeType likeType;
+
+    @Builder
+    private Likes( User user, Poster poster, Reply reply, LikeType likeType) {
+        this.user = user;
+        this.poster = poster;
+        this.reply = reply;
+        this.likeType = likeType;
+    }
 }

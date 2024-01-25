@@ -21,11 +21,6 @@ public class Reply extends BaseTimeEntity {
     @Column(name = "reply_id")
     private Long id;
     private String contents;
-    @ManyToOne
-    @JoinColumn(name = "parents_id")
-    private Reply parentsReply;
-    @OneToMany(mappedBy = "parentsReply")
-    private List<Reply> childReplies;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "poster_id")
     private Poster poster;
