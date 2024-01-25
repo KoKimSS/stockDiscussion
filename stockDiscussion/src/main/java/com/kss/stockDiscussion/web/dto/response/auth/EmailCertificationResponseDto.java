@@ -18,7 +18,7 @@ public class EmailCertificationResponseDto extends ResponseDto {
         return ResponseEntity.status(HttpStatus.OK).body(responseBody);
     }
 
-    public static ResponseEntity<ResponseDto> duplicateId() {
+    public static ResponseEntity<ResponseDto> duplicateEmail() {
         ResponseDto responseBody = new ResponseDto(ResponseCode.DUPLICATE_EMAIL, ResponseMessage.DUPLICATE_EMAIL);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
     }

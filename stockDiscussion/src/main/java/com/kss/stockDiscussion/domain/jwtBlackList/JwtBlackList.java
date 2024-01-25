@@ -1,5 +1,6 @@
 package com.kss.stockDiscussion.domain.jwtBlackList;
 
+import com.kss.stockDiscussion.domain.baseEntity.BaseTimeEntity;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -11,7 +12,7 @@ import javax.persistence.Id;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class JwtBlackList {
+public class JwtBlackList extends BaseTimeEntity {
     @Id
     @GeneratedValue
     private Long id;

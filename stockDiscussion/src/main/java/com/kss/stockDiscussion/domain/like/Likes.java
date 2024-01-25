@@ -1,5 +1,6 @@
 package com.kss.stockDiscussion.domain.like;
 
+import com.kss.stockDiscussion.domain.baseEntity.BaseTimeEntity;
 import com.kss.stockDiscussion.domain.poster.Poster;
 import com.kss.stockDiscussion.domain.user.User;
 import lombok.AccessLevel;
@@ -11,7 +12,7 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class Likes {
+public class Likes extends BaseTimeEntity {
 
     @Id
     @GeneratedValue

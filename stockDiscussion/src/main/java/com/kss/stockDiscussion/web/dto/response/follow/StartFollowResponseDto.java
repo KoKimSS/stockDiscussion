@@ -8,12 +8,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 @Getter
-public class FollowResponseDto extends ResponseDto {
-    public FollowResponseDto() {
+public class StartFollowResponseDto extends ResponseDto {
+    public StartFollowResponseDto() {
         super();
     }
-    public static ResponseEntity<FollowResponseDto> success() {
-        FollowResponseDto responseBody = new FollowResponseDto();
+    public static ResponseEntity<StartFollowResponseDto> success() {
+        StartFollowResponseDto responseBody = new StartFollowResponseDto();
         return ResponseEntity.status(HttpStatus.OK).body(responseBody);
     }
 

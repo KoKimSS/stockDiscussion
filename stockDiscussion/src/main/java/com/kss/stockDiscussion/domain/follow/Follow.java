@@ -1,5 +1,6 @@
 package com.kss.stockDiscussion.domain.follow;
 
+import com.kss.stockDiscussion.domain.baseEntity.BaseTimeEntity;
 import com.kss.stockDiscussion.domain.user.User;
 import lombok.*;
 
@@ -9,7 +10,7 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(of = {"id"})
 @Getter
-public class Follow {
+public class Follow extends BaseTimeEntity {
     @Id
     @GeneratedValue
     @Column(name = "follow_id")

@@ -5,8 +5,8 @@ import com.kss.stockDiscussion.domain.follow.Follow;
 import com.kss.stockDiscussion.domain.user.User;
 import com.kss.stockDiscussion.repository.followRepository.FollowRepository;
 import com.kss.stockDiscussion.repository.userRepository.UserRepository;
-import com.kss.stockDiscussion.web.dto.request.follow.FollowRequestDto;
-import com.kss.stockDiscussion.web.dto.response.follow.FollowResponseDto;
+import com.kss.stockDiscussion.web.dto.request.follow.StartFollowRequestDto;
+import com.kss.stockDiscussion.web.dto.response.follow.StartFollowResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -18,13 +18,13 @@ public class FollowServiceImpl implements FollowService{
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
     @Override
-    public ResponseEntity<? super FollowResponseDto> follow(FollowRequestDto dto) {
+    public ResponseEntity<? super StartFollowResponseDto> follow(StartFollowRequestDto dto) {
 
         Long followingId = dto.getFollowingId();
         Long followerId = dto.getFollowerId();
         User user = JwtUtil.findUserFromAuth();
         if(user.getId()!=followerId){
-            return FollowResponseDto.certificationFail();
+            return StartFollowResponseDto.certificationFail();
         }
         try{
             User follower = userRepository.findById(followerId).get();
@@ -34,9 +34,9 @@ public class FollowServiceImpl implements FollowService{
             followRepository.save(follow);
         }catch (Exception exception){
             exception.printStackTrace();
-            FollowResponseDto.databaseError();
+            StartFollowResponseDto.databaseError();
         }
 
-        return FollowResponseDto.success();
+        return StartFollowResponseDto.success();
     }
 }
