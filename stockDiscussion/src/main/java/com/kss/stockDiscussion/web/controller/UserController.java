@@ -1,7 +1,6 @@
 package com.kss.stockDiscussion.web.controller;
 
 import com.kss.stockDiscussion.service.userService.UserService;
-import com.kss.stockDiscussion.service.userService.UserServiceImpl;
 import com.kss.stockDiscussion.web.dto.request.user.UpdatePasswordRequestDto;
 import com.kss.stockDiscussion.web.dto.request.user.UpdateProfileRequestDto;
 import com.kss.stockDiscussion.web.dto.response.user.UpdatePasswordResponseDto;

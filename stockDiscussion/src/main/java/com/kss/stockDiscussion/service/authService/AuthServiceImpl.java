@@ -117,7 +117,7 @@ public class AuthServiceImpl implements AuthService{
                     .password(encodedPassword)
                     .name(dto.getName())
                     .introduction(dto.getIntroduction())
-                    .img_path(dto.getImgPath())
+                    .imgPath(dto.getImgPath())
                     .build();
 
             userRepository.save(user);

@@ -1,10 +1,7 @@
 package com.kss.stockDiscussion.domain.follow;
 
 import com.kss.stockDiscussion.domain.user.User;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -24,4 +21,10 @@ public class Follow {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "following_id")
     private User following;
+
+    @Builder
+    private Follow(User follower, User following) {
+        this.follower = follower;
+        this.following = following;
+    }
 }
