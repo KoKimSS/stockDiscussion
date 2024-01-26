@@ -1,5 +1,7 @@
 package com.kss.stockDiscussion.web.controller;
 
+import com.kss.stockDiscussion.config.jwt.JwtUtil;
+import com.kss.stockDiscussion.domain.user.User;
 import com.kss.stockDiscussion.service.followService.FollowService;
 import com.kss.stockDiscussion.web.dto.request.follow.StartFollowRequestDto;
 import com.kss.stockDiscussion.web.dto.response.follow.StartFollowResponseDto;
@@ -23,6 +25,10 @@ public class FollowController {
     ResponseEntity<? super StartFollowResponseDto> startFollow(
             @RequestBody @Valid StartFollowRequestDto requestBody
     ) {
+        User user = JwtUtil.findUserFromAuth();
+        if (user.getId() != requestBody.getFollowerId()) {
+            return StartFollowResponseDto.certificationFail();
+        }
         ResponseEntity<? super StartFollowResponseDto> response = followService.follow(requestBody);
         return response;
     }

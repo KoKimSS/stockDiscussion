@@ -24,7 +24,6 @@ import static com.kss.stockDiscussion.domain.newsFeed.NewsFeedType.MY_FOLLOW;
 @RequiredArgsConstructor
 public class FollowServiceImpl implements FollowService {
 
-    private final NewsFeedService newsFeedService;
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
     private final NewsFeedRepository newsFeedRepository;
@@ -35,11 +34,6 @@ public class FollowServiceImpl implements FollowService {
         Long followingId = dto.getFollowingId();
         Long followerId = dto.getFollowerId();
         try {
-            User user = JwtUtil.findUserFromAuth();
-            if (user.getId() != followerId) {
-                return StartFollowResponseDto.certificationFail();
-            }
-
             User follower = userRepository.findById(followerId).get();
             User following = userRepository.findById(followingId).get();
 
@@ -71,7 +65,6 @@ public class FollowServiceImpl implements FollowService {
             exception.printStackTrace();
             StartFollowResponseDto.databaseError();
         }
-
 
         return StartFollowResponseDto.success();
     }

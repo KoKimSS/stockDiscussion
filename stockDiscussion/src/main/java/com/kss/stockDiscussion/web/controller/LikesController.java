@@ -1,5 +1,6 @@
 package com.kss.stockDiscussion.web.controller;
 
+import com.kss.stockDiscussion.config.jwt.JwtUtil;
 import com.kss.stockDiscussion.service.likesService.LikesService;
 import com.kss.stockDiscussion.web.dto.request.likes.CreateLikesRequestDto;
 import com.kss.stockDiscussion.web.dto.response.likes.CreateLikesResponseDto;
@@ -23,6 +24,10 @@ public class LikesController {
     ResponseEntity<? super CreateLikesResponseDto> createLikes(
             @Valid @RequestBody CreateLikesRequestDto requestBody
     ) {
+        Long userId = requestBody.getUserId();
+        Long loginId = JwtUtil.findUserFromAuth().getId();
+        if (loginId != userId) return CreateLikesResponseDto.certificationFail();
+
         ResponseEntity<? super CreateLikesResponseDto> response = likesService.createLikes(requestBody);
         return response;
     }

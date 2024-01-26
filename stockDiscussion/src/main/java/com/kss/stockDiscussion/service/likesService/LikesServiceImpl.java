@@ -47,10 +47,8 @@ public class LikesServiceImpl implements LikesService{
             Long replyId = dto.getReplyId();
             if (likeType == LikeType.REPLY && replyId == null) return CreateLikesResponseDto.validationFail();
 
-            Long loginId = JwtUtil.findUserFromAuth().getId();
             Long userId = dto.getUserId();
-            if (loginId != userId) return CreateLikesResponseDto.certificationFail();
-            User user = userRepository.findById(loginId).get();
+            User user = userRepository.findById(userId).get();
             Poster poster =  posterRepository.findById(posterId).get();
 
             LikesBuilder likesBuilder = builder().likeType(likeType)
@@ -88,6 +86,7 @@ public class LikesServiceImpl implements LikesService{
                     .build();
             newsFeedList.add(newsFeed);
             newsFeedRepository.saveAll(newsFeedList);
+
         } catch (Exception exception) {
             exception.printStackTrace();
             return ResponseDto.databaseError();
