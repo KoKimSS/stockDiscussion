@@ -14,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @ToString
+@EqualsAndHashCode(of = {"id","title"})
 public class Poster extends BaseTimeEntity {
     @Id
     @GeneratedValue
@@ -25,6 +26,7 @@ public class Poster extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User owner;
+    private int likeCount;
 
     @OneToMany(mappedBy = "poster", cascade = CascadeType.ALL)
     private List<Likes> likes = new ArrayList<>();
@@ -36,5 +38,10 @@ public class Poster extends BaseTimeEntity {
         this.title = title;
         this.contents = contents;
         this.owner = owner;
+        this.likeCount=0;
+    }
+
+    public void incrementLikeCount(){
+        likeCount++;
     }
 }

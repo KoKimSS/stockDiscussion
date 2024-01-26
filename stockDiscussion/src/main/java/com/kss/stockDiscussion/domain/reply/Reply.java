@@ -6,8 +6,6 @@ import com.kss.stockDiscussion.domain.user.User;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -23,12 +21,17 @@ public class Reply extends BaseTimeEntity {
     private Poster poster;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private User owner;
+    private User user;
+    private int likeCount;
 
     @Builder
-    public Reply(String contents, Poster poster, User owner) {
+    public Reply(String contents, Poster poster, User user) {
         this.contents = contents;
         this.poster = poster;
-        this.owner = owner;
+        this.user = user;
+    }
+
+    public void incrementLikeCount(){
+        likeCount++;
     }
 }

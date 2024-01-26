@@ -20,7 +20,6 @@ import org.springframework.http.ResponseEntity;
 
 import javax.transaction.Transactional;
 
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -36,7 +35,7 @@ class LikesServiceTest {
     @Autowired
     private ReplyRepository replyRepository;
 
-    @DisplayName("라이크 종류가 포스터 인경우")
+    @DisplayName("라이크 종류가 포스터인 경우")
     @Test
     public void createLikesWithTypePoster() throws Exception {
         //given
@@ -51,33 +50,48 @@ class LikesServiceTest {
 
         //when
         ResponseEntity<? super CreateLikesResponseDto> response = likesService.createLikes(requestDto);
+        int likeCount = poster.getLikeCount();
 
         //then
+        Assertions.assertThat(likeCount).isEqualTo(1);
         Assertions.assertThat(response.getBody())
                 .extracting("code", "message")
                 .containsExactly(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
     }
 
-    private static Reply createReply(String contents,User user,Poster poster) {
-        return Reply.builder()
-                .owner(user)
-                .contents(contents)
-                .poster(poster).build();
+    @DisplayName("라이크 종류가 댓글인 경우")
+    @Test
+    public void createLikesWithTypeReply() throws Exception {
+        //given
+        User user = createUser("user");
+        userRepository.save(user);
+        Poster poster = createPoster("포스터");
+        posterRepository.save(poster);
+        Reply reply = createReply("리플", user, poster);
+        replyRepository.save(reply);
+        LikeType type = LikeType.REPLY;
+        CreateLikesRequestDto requestDto = getCreateLikesRequestDtoBuilder(type, user.getId(), reply.getId(), poster.getId());
+
+        //when
+        ResponseEntity<? super CreateLikesResponseDto> response = likesService.createLikes(requestDto);
+        int likeCount = reply.getLikeCount();
+
+        //then
+        Assertions.assertThat(likeCount).isEqualTo(1);
+        Assertions.assertThat(response.getBody())
+                .extracting("code", "message")
+                .containsExactly(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
     }
 
     private static Poster createPoster(String title) {
         return Poster.builder().title(title).build();
     }
 
-    @DisplayName("")
-    @Test
-    public void createLikesWithTypeReply() throws Exception {
-        //given
-
-        //when
-
-        //then
-
+    private static Reply createReply(String contents,User user,Poster poster) {
+        return Reply.builder()
+                .user(user)
+                .contents(contents)
+                .poster(poster).build();
     }
 
     private static CreateLikesRequestDto getCreateLikesRequestDtoBuilder(LikeType type,Long userId,Long replyId,Long posterId) {

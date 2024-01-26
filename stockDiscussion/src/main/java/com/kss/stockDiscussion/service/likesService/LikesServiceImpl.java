@@ -5,6 +5,7 @@ import com.kss.stockDiscussion.config.jwt.JwtUtil;
 import com.kss.stockDiscussion.domain.follow.Follow;
 import com.kss.stockDiscussion.domain.like.LikeType;
 import com.kss.stockDiscussion.domain.like.Likes;
+import com.kss.stockDiscussion.domain.newsFeed.ActivityType;
 import com.kss.stockDiscussion.domain.newsFeed.NewsFeed;
 import com.kss.stockDiscussion.domain.poster.Poster;
 import com.kss.stockDiscussion.domain.reply.Reply;
@@ -15,7 +16,9 @@ import com.kss.stockDiscussion.repository.newsFeedRepository.NewsFeedRepository;
 import com.kss.stockDiscussion.repository.posterRepository.PosterRepository;
 import com.kss.stockDiscussion.repository.replyRepository.ReplyRepository;
 import com.kss.stockDiscussion.repository.userRepository.UserRepository;
+import com.kss.stockDiscussion.service.newsFeedService.NewsFeedService;
 import com.kss.stockDiscussion.web.dto.request.likes.CreateLikesRequestDto;
+import com.kss.stockDiscussion.web.dto.request.newsFeed.CreateNewsFeedRequestDto;
 import com.kss.stockDiscussion.web.dto.response.ResponseDto;
 import com.kss.stockDiscussion.web.dto.response.likes.CreateLikesResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -35,8 +38,7 @@ public class LikesServiceImpl implements LikesService{
     private final UserRepository userRepository;
     private final PosterRepository posterRepository;
     private final ReplyRepository replyRepository;
-    private final FollowRepository followRepository;
-    private final NewsFeedRepository newsFeedRepository;
+    private final NewsFeedService newsFeedService;
 
     @Override
     public ResponseEntity<? super CreateLikesResponseDto> createLikes(CreateLikesRequestDto dto) {
@@ -54,43 +56,32 @@ public class LikesServiceImpl implements LikesService{
             LikesBuilder likesBuilder = builder().likeType(likeType)
                     .user(user)
                     .poster(poster);
-
             if(likeType == LikeType.REPLY){
-                Reply requestReply = replyRepository.findById(replyId).get();
-                likesBuilder.reply(requestReply);
+                Reply reply = replyRepository.findById(replyId).get();
+                likesBuilder.reply(reply);
+                reply.incrementLikeCount();
+            }
+            if(likeType == LikeType.POSTER){
+                poster.incrementLikeCount();
             }
             Likes newLikes = likesBuilder.build();
             likesRepository.save(newLikes);
 
-
-            //나를 팔로우 하는 사람들의 뉴스피드 업데이트
-            List<Follow> followerFollowList = followRepository.findByFollowingId(userId);
-            List<NewsFeed> newsFeedList = followerFollowList.stream()
-                    .map(followerFollow -> {
-                        User newsFeedOwner = followerFollow.getFollower();
-                        return NewsFeed.builder()
-                                .newsFeedType(FOLLOWING_LIKE)
-                                .user(newsFeedOwner)
-                                .activityUser(user)
-                                .relatedPoster(poster)
-                                .relatedUser(poster.getOwner())
-                                .build();
-                    })
-                    .collect(Collectors.toList());
-            //내가 좋아요를 누른 게시글 소유자의 뉴스피드 업데이트
-            NewsFeed newsFeed = NewsFeed.builder()
-                    .newsFeedType(MY_LIKE)
-                    .user(poster.getOwner())
-                    .activityUser(user)
+            //뉴스피드 생성 서비스 호출 !
+            CreateNewsFeedRequestDto createNewsFeedRequestDto = CreateNewsFeedRequestDto.builder()
+                    .user(user)
+                    .activityType(ActivityType.LIKE)
                     .relatedPoster(poster)
+                    .relatedUser(poster.getOwner())
                     .build();
-            newsFeedList.add(newsFeed);
-            newsFeedRepository.saveAll(newsFeedList);
+
+            newsFeedService.createNewsFeed(createNewsFeedRequestDto);
 
         } catch (Exception exception) {
             exception.printStackTrace();
             return ResponseDto.databaseError();
         }
+
         return CreateLikesResponseDto.success();
     }
 }

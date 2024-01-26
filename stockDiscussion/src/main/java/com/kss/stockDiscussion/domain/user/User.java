@@ -1,6 +1,5 @@
 package com.kss.stockDiscussion.domain.user;
 
-import com.kss.stockDiscussion.domain.baseEntity.BaseEntity;
 import com.kss.stockDiscussion.domain.baseEntity.BaseTimeEntity;
 import com.kss.stockDiscussion.domain.follow.Follow;
 import com.kss.stockDiscussion.domain.like.Likes;
@@ -35,7 +34,7 @@ public class User extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "follower")
     private List<Follow> following = new ArrayList<>();
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Reply> replies = new ArrayList<>();
 
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)

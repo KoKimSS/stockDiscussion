@@ -12,14 +12,7 @@ import java.util.List;
 
 public interface NewsFeedRepository extends JpaRepository<NewsFeed,Long> {
     // 유저 아이디와 뉴스피드 타입을 이용하여 페이징으로 뉴스피드 찾기
-    @Query("SELECT nf FROM NewsFeed nf " +
-            "WHERE nf.user.id = :userId " +
-            "AND nf.newsFeedType IN :newsFeedTypes " +
-            "ORDER BY nf.createdDate DESC")
-    Page<NewsFeed> findByUserIdAndNewsFeedTypeInOrderByCreatedAtDesc(
-            @Param("userId") Long userId,
-            @Param("newsFeedTypes") List<NewsFeedType> newsFeedTypes,
-            Pageable pageable);
-
     Page<NewsFeed> findByUserId(Long userId,Pageable pageable);
+
+    List<NewsFeed> findAllByUserId(Long userId);
 }

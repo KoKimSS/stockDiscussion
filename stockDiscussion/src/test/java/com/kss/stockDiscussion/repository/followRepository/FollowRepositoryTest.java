@@ -27,8 +27,8 @@ public class FollowRepositoryTest {
     @DisplayName("팔로잉 아이디를 통하여 팔로우 정보 찾기")
     @Test
     public void findByFollowingId() throws Exception {
-        //given
 
+        //given
         User user1 = User.builder().name("user1")
                 .email("email1@naver.com")
                 .password("1234")
