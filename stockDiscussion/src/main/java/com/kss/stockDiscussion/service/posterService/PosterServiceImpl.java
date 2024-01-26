@@ -36,9 +36,6 @@ public class PosterServiceImpl implements PosterService {
 
         try {
             Long userId = dto.getUserId();
-            if (findUserFromAuth().getId() != userId) {
-                return CreatePosterResponseDto.certificationFail();
-            }
             User user = userRepository.findById(userId).get();
             Poster poster = Poster.builder().title(dto.getTitle())
                     .contents(dto.getContents())

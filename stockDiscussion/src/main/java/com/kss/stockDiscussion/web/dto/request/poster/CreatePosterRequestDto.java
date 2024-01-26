@@ -2,10 +2,7 @@ package com.kss.stockDiscussion.web.dto.request.poster;
 
 
 import com.kss.stockDiscussion.web.dto.request.RequestDto;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -20,4 +17,11 @@ public class CreatePosterRequestDto extends RequestDto {
     private String title;
     @NotBlank
     private String contents;
+
+    @Builder
+    private CreatePosterRequestDto(Long userId, String title, String contents) {
+        this.userId = userId;
+        this.title = title;
+        this.contents = contents;
+    }
 }

@@ -39,8 +39,6 @@ public class ReplyServiceImpl implements ReplyService{
     public ResponseEntity<? super CreateReplyResponseDto> createReply(CreateReplyRequestDto dto) {
         try {
             Long userId = dto.getUserId();
-            Long loginId = JwtUtil.findUserFromAuth().getId();
-            if(loginId!=userId) return ResponseDto.certificationFail();
 
             Long posterId = dto.getPosterId();
             User user = userRepository.findById(userId).get();

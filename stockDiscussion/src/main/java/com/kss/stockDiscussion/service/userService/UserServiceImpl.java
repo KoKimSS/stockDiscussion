@@ -24,23 +24,17 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public ResponseEntity<? super UpdatePasswordResponseDto> updatePassword(UpdatePasswordRequestDto dto) {
-        Long requestUserId = dto.getUserId();
-
-        Long loginId = JwtUtil.findUserFromAuth().getId();
-        if (loginId != requestUserId) {
-            return UpdatePasswordResponseDto.validationFail();
-        }
-
         try {
-            Optional<User> userById = userRepository.findById(requestUserId);
-            if (!userById.isPresent()) {
-                return UpdatePasswordResponseDto.databaseError();
-            }
-
-            User user = userById.get();
-            // 새로운 비밀번호 해싱
-            String newPassword = dto.getPassword();
             BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+            Long requestUserId = dto.getUserId();
+            User user = userRepository.findById(requestUserId).get();
+            String password = dto.getPassword();
+            String newPassword = dto.getNewPassword();
+            if(!passwordEncoder.matches(password, user.getPassword())){
+                return UpdateProfileResponseDto.certificationFail();
+            }
+            // 새로운 비밀번호 해싱
             String hashedPassword = passwordEncoder.encode(newPassword);
             user.updatePassword(hashedPassword);
         } catch (Exception exception) {

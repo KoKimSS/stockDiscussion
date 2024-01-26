@@ -1,5 +1,6 @@
 package com.kss.stockDiscussion.web.controller;
 
+import com.kss.stockDiscussion.config.jwt.JwtUtil;
 import com.kss.stockDiscussion.service.userService.UserService;
 import com.kss.stockDiscussion.web.dto.request.user.UpdatePasswordRequestDto;
 import com.kss.stockDiscussion.web.dto.request.user.UpdateProfileRequestDto;
@@ -19,6 +20,10 @@ public class UserController {
     @PostMapping("/update-password")
     ResponseEntity<? super UpdatePasswordResponseDto> updatePassword(
             @RequestBody@Valid UpdatePasswordRequestDto requestBody) {
+        Long loginId = JwtUtil.findUserFromAuth().getId();
+        if (loginId != requestBody.getUserId()) {
+            return UpdatePasswordResponseDto.validationFail();
+        }
         ResponseEntity<? super UpdatePasswordResponseDto> response = userService.updatePassword(requestBody);
         return response;
     }

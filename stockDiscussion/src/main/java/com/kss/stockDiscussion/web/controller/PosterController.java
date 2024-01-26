@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
+import static com.kss.stockDiscussion.config.jwt.JwtUtil.findUserFromAuth;
+
 @RestController
 @RequestMapping("/api/poster")
 @RequiredArgsConstructor
@@ -23,6 +25,9 @@ public class PosterController {
     ResponseEntity<?super CreatePosterResponseDto> createPoster(
             @Valid@RequestBody CreatePosterRequestDto requestBody
             ){
+        if (findUserFromAuth().getId() != requestBody.getUserId()) {
+            return CreatePosterResponseDto.certificationFail();
+        }
         ResponseEntity<? super CreatePosterResponseDto> response = posterService.createPoster(requestBody);
         return response;
     }

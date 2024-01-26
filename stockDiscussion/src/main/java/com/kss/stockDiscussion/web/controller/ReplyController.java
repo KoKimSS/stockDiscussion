@@ -1,7 +1,9 @@
 package com.kss.stockDiscussion.web.controller;
 
+import com.kss.stockDiscussion.config.jwt.JwtUtil;
 import com.kss.stockDiscussion.service.replyService.ReplyService;
 import com.kss.stockDiscussion.web.dto.request.reply.CreateReplyRequestDto;
+import com.kss.stockDiscussion.web.dto.response.ResponseDto;
 import com.kss.stockDiscussion.web.dto.response.reply.CreateReplyResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,8 @@ public class ReplyController {
     ResponseEntity<?super CreateReplyResponseDto> createReply(
             @Valid @RequestBody CreateReplyRequestDto requestBody
     ){
+        Long loginId = JwtUtil.findUserFromAuth().getId();
+        if(loginId!= requestBody.getUserId()) return ResponseDto.certificationFail();
         ResponseEntity<? super CreateReplyResponseDto> response = replyService.createReply(requestBody);
         return response;
     }
