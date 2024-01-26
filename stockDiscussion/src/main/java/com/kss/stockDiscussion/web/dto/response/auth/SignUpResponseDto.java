@@ -24,10 +24,6 @@ public class SignUpResponseDto extends ResponseDto {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
     }
 
-    public static ResponseEntity<ResponseDto> certificationExpired() {
-        ResponseDto responseBody = new ResponseDto(ResponseCode.CERTIFICATION_EXPIRED, ResponseMessage.CERTIFICATION_EXPIRED);
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseBody);
-    }
 
     public static ResponseEntity<ResponseDto> certificationFail() {
         ResponseDto responseBody = new ResponseDto(ResponseCode.CERTIFICATION_FAIL, ResponseMessage.CERTIFICATION_FAIL);

@@ -1,6 +1,5 @@
 package com.kss.stockDiscussion.domain.newsFeed;
 
-import com.kss.stockDiscussion.domain.activity.ActivityType;
 import com.kss.stockDiscussion.domain.baseEntity.BaseTimeEntity;
 import com.kss.stockDiscussion.domain.poster.Poster;
 import com.kss.stockDiscussion.domain.user.User;
@@ -60,7 +59,7 @@ public class NewsFeed extends BaseTimeEntity {
         if(newsFeedType== NewsFeedType.MY_FOLLOW){
             return activityUser.getName() + "님이 나를 팔로우 합니다";
         }
-        if(newsFeedType== NewsFeedType.MY_RELY){
+        if(newsFeedType== NewsFeedType.MY_REPLY){
             return activityUser.getName() + "님이 나의 " + relatedPoster.getTitle() + " 글에 답글을 달았습니다.";
         }
         if(newsFeedType== NewsFeedType.MY_LIKE){

@@ -26,6 +26,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -39,7 +40,7 @@ public class AuthServiceImpl implements AuthService{
     private final CertificationRepository certificationRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtBlackListRepository jwtBlackListRepository;
-    private final int TimeValid = 2;
+    public static final int TimeValid = 2;
     @Override
     public ResponseEntity<? super EmailCheckResponseDto> emailCheck(EmailCheckRequestDto dto) {
         try {
@@ -84,6 +85,7 @@ public class AuthServiceImpl implements AuthService{
         try {
             String email = dto.getEmail();
             String certificationNumber = dto.getCertificationNumber();
+            LocalDateTime certificateTime = dto.getCertificateTime();
 
             Optional<Certification> byUserEmail = certificationRepository.findByEmail(email);
             if(!byUserEmail.isPresent()) return CheckCertificationResponseDto.certificationFail();
@@ -92,6 +94,11 @@ public class AuthServiceImpl implements AuthService{
 
             boolean isMatch = isDtoMatchCertification(email, certificationNumber, certification);
             if(!isMatch) return CheckCertificationResponseDto.certificationFail();
+
+            boolean timeValid = isCertificationTimeValid(certification,certificateTime);
+            if(!timeValid) return CheckCertificationResponseDto.certificationExpired();
+            certification.certificated();
+            System.out.println("certification = " + certification.getIsCertified());
 
         } catch (Exception exception) {
             exception.printStackTrace();
@@ -112,10 +119,8 @@ public class AuthServiceImpl implements AuthService{
             Optional<Certification> optionalCertificationByEmail = certificationRepository.findByEmail(email);
 
             if(!optionalCertificationByEmail.isPresent()) SignUpResponseDto.certificationFail();
-
             Certification certificationByEmail = optionalCertificationByEmail.get();
-            boolean timeValid = isCertificationTimeValid(certificationByEmail);
-            if(!timeValid) return SignUpResponseDto.certificationExpired();
+
             if(!isDtoMatchCertification(email,certificationNumber,certificationByEmail))
                 return SignUpResponseDto.certificationFail();
 
@@ -130,7 +135,6 @@ public class AuthServiceImpl implements AuthService{
 
             userRepository.save(user);
             certificationRepository.deleteByEmail(email);
-
         } catch (Exception exception) {
             exception.printStackTrace();
             return ResponseDto.databaseError();
@@ -161,12 +165,9 @@ public class AuthServiceImpl implements AuthService{
         return certificationNumber;
     }
 
-    private boolean isCertificationTimeValid(Certification certification) {
-        LocalDateTime currentTime = LocalDateTime.now();
+    private boolean isCertificationTimeValid(Certification certification,LocalDateTime certificateTime) {
         LocalDateTime certificationCreationTime = certification.getCreatedDate();
-
-        Duration duration = Duration.between(certificationCreationTime, currentTime);
-
+        Duration duration = Duration.between(certificationCreationTime, certificateTime);
         return duration.toMinutes() <= TimeValid;
     }
 }

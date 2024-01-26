@@ -1,7 +1,7 @@
 package com.kss.stockDiscussion.domain.newsFeed;
 
 public enum NewsFeedType {
-    MY_RELY("내 글에 리플을 담"),
+    MY_REPLY("내 글에 리플을 담"),
     MY_LIKE("내 글에 좋아요를 누름"),
     MY_FOLLOW("나를 팔로우 함"),
     FOLLOWING_REPLY("팔로잉이 어떤 글에 리플을 담"),

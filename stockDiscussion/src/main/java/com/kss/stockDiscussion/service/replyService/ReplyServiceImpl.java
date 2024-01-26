@@ -66,7 +66,7 @@ public class ReplyServiceImpl implements ReplyService{
                     .collect(Collectors.toList());
             //내가 좋아요를 누른 게시글 소유자의 뉴스피드 업데이트
             NewsFeed newsFeed = NewsFeed.builder()
-                    .newsFeedType(MY_RELY)
+                    .newsFeedType(MY_REPLY)
                     .user(poster.getOwner())
                     .activityUser(user)
                     .relatedPoster(poster)

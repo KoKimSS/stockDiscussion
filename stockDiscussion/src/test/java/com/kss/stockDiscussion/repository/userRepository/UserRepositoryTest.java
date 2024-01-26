@@ -7,11 +7,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import javax.transaction.Transactional;
+
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 
 @SpringBootTest
+@Transactional
 class UserRepositoryTest {
 
     @Autowired
@@ -21,7 +24,7 @@ class UserRepositoryTest {
     @Test
     public void findByEmail() throws Exception {
         //given
-        String email = "email@email.com";
+        String email = "exist@email.com";
         User user = User.builder().email(email).build();
         userRepository.save(user);
 

@@ -1,6 +1,7 @@
 package com.kss.stockDiscussion.web.dto.request.auth;
 
 import com.kss.stockDiscussion.web.dto.request.RequestDto;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -31,4 +32,13 @@ public class SignUpRequestDto extends RequestDto {
     @NotBlank
     private String certificationNumber;
 
+    @Builder
+    private SignUpRequestDto(String email, String password, String name, String imgPath, String introduction, String certificationNumber) {
+        this.email = email;
+        this.password = password;
+        this.name = name;
+        this.imgPath = imgPath;
+        this.introduction = introduction;
+        this.certificationNumber = certificationNumber;
+    }
 }

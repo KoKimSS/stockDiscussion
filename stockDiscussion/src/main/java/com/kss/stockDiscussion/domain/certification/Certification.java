@@ -7,6 +7,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -19,9 +20,18 @@ public class Certification extends BaseTimeEntity {
 
     String email;
     String certificationNumber;
+    Boolean isCertified ;
+    private LocalDateTime createdDate;
+
     @Builder
-    private Certification(String email,String certificationNumber){
+    private Certification(String email,String certificationNumber,LocalDateTime localDateTime){
         this.email = email;
         this.certificationNumber = certificationNumber;
+        this.createdDate = localDateTime;
+        this.isCertified = false;
+    }
+
+    public void certificated(){
+        this.isCertified = true;
     }
 }

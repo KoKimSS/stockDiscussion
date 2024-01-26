@@ -1,8 +1,6 @@
 package com.kss.stockDiscussion.web.dto.response.newsFeed;
 
 
-import com.kss.stockDiscussion.domain.activity.ActivityType;
-import com.kss.stockDiscussion.domain.newsFeed.NewsFeed;
 import com.kss.stockDiscussion.domain.newsFeed.NewsFeedType;
 import lombok.Builder;
 import lombok.Getter;

@@ -11,6 +11,5 @@ import java.util.Optional;
 public interface CertificationRepository extends JpaRepository<Certification, Long> {
     Optional<Certification> findByEmail(String email);
 
-    @Transactional
     void deleteByEmail(String email);
 }
