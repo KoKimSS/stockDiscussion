@@ -3,7 +3,7 @@ package com.kss.stockDiscussion.service.posterService;
 import com.kss.stockDiscussion.common.ResponseCode;
 import com.kss.stockDiscussion.common.ResponseMessage;
 import com.kss.stockDiscussion.domain.user.User;
-import com.kss.stockDiscussion.repository.userRepository.UserRepository;
+import com.kss.stockDiscussion.repository.userRepository.UserJpaRepository;
 import com.kss.stockDiscussion.web.dto.request.poster.CreatePosterRequestDto;
 import com.kss.stockDiscussion.web.dto.response.poster.CreatePosterResponseDto;
 import org.assertj.core.api.Assertions;
@@ -15,8 +15,6 @@ import org.springframework.http.ResponseEntity;
 
 import javax.transaction.Transactional;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest
 @Transactional
 class PosterServiceTest {
@@ -24,14 +22,14 @@ class PosterServiceTest {
     @Autowired
     private PosterService posterService;
     @Autowired
-    private UserRepository userRepository;
+    private UserJpaRepository userJpaRepository;
 
     @DisplayName("포스터를 생성하는 서비스 이다")
     @Test
     public void createPoster() throws Exception {
         //given
         User user = getUser();
-        userRepository.save(user);
+        userJpaRepository.save(user);
         Long userId = user.getId();
         String title = "title";
         String contents = "contents";

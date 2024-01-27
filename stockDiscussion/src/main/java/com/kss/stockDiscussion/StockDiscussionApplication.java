@@ -8,7 +8,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @SpringBootApplication
 public class StockDiscussionApplication {
-
 	@Bean
 	BCryptPasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
@@ -16,5 +15,4 @@ public class StockDiscussionApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(StockDiscussionApplication.class, args);
 	}
-
 }

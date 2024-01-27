@@ -11,9 +11,9 @@ import javax.transaction.Transactional;
 
 @SpringBootTest
 @Transactional
-class JwtBlackListRepositoryTest {
+class JwtBlackListJpaRepositoryTest {
     @Autowired
-    JwtBlackListRepository jwtBlackListRepository;
+    JwtBlackListJpaRepository jwtBlackListJpaRepository;
 
     @DisplayName("저장된 토큰 번호로 존재 유무 확인")
     @Test
@@ -21,10 +21,10 @@ class JwtBlackListRepositoryTest {
         //given
         String savedToken = "1234";
         JwtBlackList jwtBlackList1 = JwtBlackList.builder().token(savedToken).build();
-        jwtBlackListRepository.save(jwtBlackList1);
+        jwtBlackListJpaRepository.save(jwtBlackList1);
 
         //when
-        boolean existsBySavedToken = jwtBlackListRepository.existsByToken(savedToken);
+        boolean existsBySavedToken = jwtBlackListJpaRepository.existsByToken(savedToken);
 
         //then
         Assertions.assertTrue(existsBySavedToken);
@@ -37,9 +37,9 @@ class JwtBlackListRepositoryTest {
         String savedToken = "1234";
         String unknownToken = "5678";
         JwtBlackList jwtBlackList1 = JwtBlackList.builder().token(savedToken).build();
-        jwtBlackListRepository.save(jwtBlackList1);
+        jwtBlackListJpaRepository.save(jwtBlackList1);
         //when
-        boolean existsByUnknownToken = jwtBlackListRepository.existsByToken(unknownToken);
+        boolean existsByUnknownToken = jwtBlackListJpaRepository.existsByToken(unknownToken);
 
         //then
         Assertions.assertFalse(existsByUnknownToken);

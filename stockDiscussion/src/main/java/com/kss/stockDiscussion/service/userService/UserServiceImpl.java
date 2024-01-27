@@ -2,7 +2,7 @@ package com.kss.stockDiscussion.service.userService;
 
 import com.kss.stockDiscussion.config.jwt.JwtUtil;
 import com.kss.stockDiscussion.domain.user.User;
-import com.kss.stockDiscussion.repository.userRepository.UserRepository;
+import com.kss.stockDiscussion.repository.userRepository.UserJpaRepository;
 import com.kss.stockDiscussion.web.dto.request.user.UpdatePasswordRequestDto;
 import com.kss.stockDiscussion.web.dto.request.user.UpdateProfileRequestDto;
 import com.kss.stockDiscussion.web.dto.response.ResponseDto;
@@ -19,7 +19,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    private final UserRepository userRepository;
+    private final UserJpaRepository userJpaRepository;
 
     @Override
     @Transactional
@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserService {
             BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
             Long requestUserId = dto.getUserId();
-            User user = userRepository.findById(requestUserId).get();
+            User user = userJpaRepository.findById(requestUserId).get();
             String password = dto.getPassword();
             String newPassword = dto.getNewPassword();
             if(!passwordEncoder.matches(password, user.getPassword())){
@@ -55,7 +55,7 @@ public class UserServiceImpl implements UserService {
         }
 
         try {
-            Optional<User> userById = userRepository.findById(requestUserId);
+            Optional<User> userById = userJpaRepository.findById(requestUserId);
             if (!userById.isPresent()) {
                 return UpdateProfileResponseDto.databaseError();
             }

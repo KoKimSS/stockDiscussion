@@ -1,5 +1,6 @@
 package com.kss.stockDiscussion.web.controller;
 
+import com.kss.stockDiscussion.config.jwt.JwtProperties;
 import com.kss.stockDiscussion.service.authService.AuthService;
 import com.kss.stockDiscussion.web.dto.request.auth.CheckCertificationRequestDto;
 import com.kss.stockDiscussion.web.dto.request.auth.EmailCertificationRequestDto;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -46,13 +48,21 @@ public class AuthController {
     public ResponseEntity<? super CheckCertificationResponseDto> checkCertification(
             @RequestBody @Valid CheckCertificationRequestDto requestBody
     ) {
+        requestBody.setCertificateTime(LocalDateTime.now());
         ResponseEntity<? super CheckCertificationResponseDto> response = authService.checkCertification(requestBody);
         return response;
     }
 
     @PostMapping("/log-out")
     public ResponseEntity<? super ResponseDto> logOut(HttpServletRequest request) {
-        ResponseEntity<? super ResponseDto> response = authService.logOut(request);
+        String tokenHeader = request.getHeader(JwtProperties.HEADER_STRING);
+        // 헤더 값이 없을 경우에 대한 처리
+        if (tokenHeader == null || tokenHeader.isEmpty()) {
+            return ResponseDto.certificationFail();
+        }
+        String token = tokenHeader.replace(JwtProperties.TOKEN_PREFIX, "");
+
+        ResponseEntity<? super ResponseDto> response = authService.logOut(token);
         return response;
     }
 

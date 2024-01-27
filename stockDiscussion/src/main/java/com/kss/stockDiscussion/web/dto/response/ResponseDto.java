@@ -4,6 +4,7 @@ import com.kss.stockDiscussion.common.ResponseCode;
 import com.kss.stockDiscussion.common.ResponseMessage;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -12,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 public class ResponseDto {
     private String code;
     private String message;
-
 
     public ResponseDto() {
         this.code = ResponseCode.SUCCESS;
@@ -31,7 +31,6 @@ public class ResponseDto {
 
     public static ResponseEntity<ResponseDto> certificationFail() {
         ResponseDto responseBody = new ResponseDto(ResponseCode.CERTIFICATION_FAIL, ResponseMessage.CERTIFICATION_FAIL);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseBody);
     }
-
 }

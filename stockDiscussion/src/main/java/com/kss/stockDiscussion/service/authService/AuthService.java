@@ -23,5 +23,5 @@ public interface AuthService {
 
     ResponseEntity<? super SignUpResponseDto> singUp(SignUpRequestDto dto);
 
-    ResponseEntity<? super ResponseDto> logOut(HttpServletRequest request);
+    ResponseEntity<? super ResponseDto> logOut(String token);
 }

@@ -3,7 +3,7 @@ package com.kss.stockDiscussion.service.userService;
 import com.kss.stockDiscussion.common.ResponseCode;
 import com.kss.stockDiscussion.common.ResponseMessage;
 import com.kss.stockDiscussion.domain.user.User;
-import com.kss.stockDiscussion.repository.userRepository.UserRepository;
+import com.kss.stockDiscussion.repository.userRepository.UserJpaRepository;
 import com.kss.stockDiscussion.web.dto.request.user.UpdatePasswordRequestDto;
 import com.kss.stockDiscussion.web.dto.response.user.UpdatePasswordResponseDto;
 import org.assertj.core.api.Assertions;
@@ -24,7 +24,7 @@ class UserServiceTest {
     UserService userService;
 
     @Autowired
-    UserRepository userRepository;
+    UserJpaRepository userJpaRepository;
 
     @DisplayName("기존과 매칭되는 비밀번호를 이용해 새로운 비밀번호를 업데이트 한다")
     @Test
@@ -34,7 +34,7 @@ class UserServiceTest {
         String password = "password123";
         String encodedPassword = passwordEncoder.encode(password);
         User user = User.builder().name("user").password(encodedPassword).build();
-        userRepository.save(user);
+        userJpaRepository.save(user);
 
         String newPassword = "newpassword123";
 
@@ -62,7 +62,7 @@ class UserServiceTest {
         String wrongPassword = "password456";
         String encodedPassword = passwordEncoder.encode(password);
         User user = User.builder().name("user").password(encodedPassword).build();
-        userRepository.save(user);
+        userJpaRepository.save(user);
 
         String newPassword = "newpassword123";
 

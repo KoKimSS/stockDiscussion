@@ -4,16 +4,19 @@ import com.kss.stockDiscussion.common.ResponseCode;
 import com.kss.stockDiscussion.common.ResponseMessage;
 import com.kss.stockDiscussion.domain.certification.Certification;
 import com.kss.stockDiscussion.domain.user.User;
-import com.kss.stockDiscussion.repository.certificationRepository.CertificationRepository;
-import com.kss.stockDiscussion.repository.userRepository.UserRepository;
+import com.kss.stockDiscussion.repository.certificationRepository.CertificationJpaRepository;
+import com.kss.stockDiscussion.repository.jwtBlackListRepository.JwtBlackListJpaRepository;
+import com.kss.stockDiscussion.repository.userRepository.UserJpaRepository;
 import com.kss.stockDiscussion.web.dto.request.auth.CheckCertificationRequestDto;
 import com.kss.stockDiscussion.web.dto.request.auth.EmailCertificationRequestDto;
 import com.kss.stockDiscussion.web.dto.request.auth.EmailCheckRequestDto;
 import com.kss.stockDiscussion.web.dto.request.auth.SignUpRequestDto;
+import com.kss.stockDiscussion.web.dto.response.ResponseDto;
 import com.kss.stockDiscussion.web.dto.response.auth.CheckCertificationResponseDto;
 import com.kss.stockDiscussion.web.dto.response.auth.EmailCertificationResponseDto;
 import com.kss.stockDiscussion.web.dto.response.auth.EmailCheckResponseDto;
 import com.kss.stockDiscussion.web.dto.response.auth.SignUpResponseDto;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +35,11 @@ class AuthServiceTest {
     @Autowired
     private AuthService authService;
     @Autowired
-    private UserRepository userRepository;
+    private UserJpaRepository userJpaRepository;
     @Autowired
-    private CertificationRepository certificationRepository;
+    private CertificationJpaRepository certificationJpaRepository;
+    @Autowired
+    private JwtBlackListJpaRepository jwtBlackListJpaRepository;
 
     @DisplayName("이메일이 중복되어 있는 경우")
     @Test
@@ -42,7 +47,7 @@ class AuthServiceTest {
         //given
         String email = "email@email.com";
         User user = createUser(email);
-        userRepository.save(user);
+        userJpaRepository.save(user);
         EmailCheckRequestDto requestDto = createEmailCheckRequestDto(email);
 
         //when
@@ -61,7 +66,7 @@ class AuthServiceTest {
         String email = "email@email.com";
         String newEmail = "newEmail@gmail.com";
         User user = createUser(email);
-        userRepository.save(user);
+        userJpaRepository.save(user);
         EmailCheckRequestDto requestDto = createEmailCheckRequestDto(newEmail);
 
         //when
@@ -81,7 +86,7 @@ class AuthServiceTest {
         //given
         String email = "email@email.com";
         User user = createUser(email);
-        userRepository.save(user);
+        userJpaRepository.save(user);
         EmailCertificationRequestDto duplicatedRequestDto = getEmailCertificationRequestDto(email);
 
         //when
@@ -102,7 +107,7 @@ class AuthServiceTest {
         String email = "email@email.com";
         String newEmail = "newEmail@email.com";
         User user = createUser(email);
-        userRepository.save(user);
+        userJpaRepository.save(user);
         EmailCertificationRequestDto successRequestDto = getEmailCertificationRequestDto(newEmail);
 
         //when
@@ -126,12 +131,12 @@ class AuthServiceTest {
         LocalDateTime successTime = LocalDateTime.of(2024, 1, 1, 0, AuthServiceImpl.TimeValid);
 
         Certification certification = createCertification(email, number, createdTime);
-        certificationRepository.save(certification);
+        certificationJpaRepository.save(certification);
 
         CheckCertificationRequestDto successRequest = getCheckCertificationRequestDto(email, number, successTime);
         //when
         ResponseEntity<? super CheckCertificationResponseDto> successResponse = authService.checkCertification(successRequest);
-        Boolean isCertified = certificationRepository.findByEmail(email).get().getIsCertified();
+        Boolean isCertified = certificationJpaRepository.findByEmail(email).get().getIsCertified();
 
         //then
         assertThat(isCertified).isTrue();
@@ -152,12 +157,12 @@ class AuthServiceTest {
         LocalDateTime failTime = LocalDateTime.of(2024, 1, 1, 0, AuthServiceImpl.TimeValid + 1);
 
         Certification certification = createCertification(email, number, createdTime);
-        certificationRepository.save(certification);
+        certificationJpaRepository.save(certification);
 
         CheckCertificationRequestDto timeExceedRequest = getCheckCertificationRequestDto(email, number, failTime);
         //when
         ResponseEntity<? super CheckCertificationResponseDto> timeExceedResponse = authService.checkCertification(timeExceedRequest);
-        Boolean isCertified = certificationRepository.findByEmail(email).get().getIsCertified();
+        Boolean isCertified = certificationJpaRepository.findByEmail(email).get().getIsCertified();
 
         //then
         assertThat(isCertified).isFalse();
@@ -178,12 +183,12 @@ class AuthServiceTest {
         LocalDateTime successTime = LocalDateTime.of(2024, 1, 1, 0, AuthServiceImpl.TimeValid);
 
         Certification certification = createCertification(email, number, createdTime);
-        certificationRepository.save(certification);
+        certificationJpaRepository.save(certification);
 
         CheckCertificationRequestDto wrongEmailRequest = getCheckCertificationRequestDto(wrongEmail, number, successTime);
         //when
         ResponseEntity<? super CheckCertificationResponseDto> wrongEmailResponse = authService.checkCertification(wrongEmailRequest);
-        Boolean isCertified = certificationRepository.findByEmail(email).get().getIsCertified();
+        Boolean isCertified = certificationJpaRepository.findByEmail(email).get().getIsCertified();
 
         //then
         assertThat(isCertified).isFalse();
@@ -205,13 +210,13 @@ class AuthServiceTest {
         LocalDateTime successTime = LocalDateTime.of(2024, 1, 1, 0, AuthServiceImpl.TimeValid);
 
         Certification certification = createCertification(email, number, createdTime);
-        certificationRepository.save(certification);
+        certificationJpaRepository.save(certification);
 
         CheckCertificationRequestDto wrongNumberRequest = getCheckCertificationRequestDto(email, wrongNumber, successTime);
 
         //when
         ResponseEntity<? super CheckCertificationResponseDto> wrongNumberResponse = authService.checkCertification(wrongNumberRequest);
-        Boolean isCertified = certificationRepository.findByEmail(email).get().getIsCertified();
+        Boolean isCertified = certificationJpaRepository.findByEmail(email).get().getIsCertified();
 
         //then
         assertThat(isCertified).isFalse();
@@ -229,7 +234,7 @@ class AuthServiceTest {
         String number = "1234";
         String email = "email@naver.com";
         Certification certification = createCertification(email, number, LocalDateTime.now());
-        certificationRepository.save(certification);
+        certificationJpaRepository.save(certification);
         certification.certificated();
         SignUpRequestDto successRequestDto = getSignUpRequestDto(number, email);
 
@@ -254,7 +259,7 @@ class AuthServiceTest {
         String wrongEmail = "wrong@naver.com";
         Certification certification = createCertification(email, number, LocalDateTime.now());
         certification.certificated();
-        certificationRepository.save(certification);
+        certificationJpaRepository.save(certification);
         SignUpRequestDto wrongEmailRequestDto = getSignUpRequestDto(number, wrongEmail);
 
         //when
@@ -275,7 +280,7 @@ class AuthServiceTest {
         String email = "email@naver.com";
         String wrongNumber = "5678";
         Certification certification = createCertification(email, number, LocalDateTime.now());
-        certificationRepository.save(certification);
+        certificationJpaRepository.save(certification);
         certification.certificated();
         SignUpRequestDto wrongNumberRequestDto = getSignUpRequestDto(wrongNumber, email);
 
@@ -290,6 +295,21 @@ class AuthServiceTest {
                 );
     }
 
+    @DisplayName("로그인이 되어 있는 경우 JWT 블랙리스트에 현재 토큰 추가")
+    @Test
+    public void logOut() throws Exception {
+        //given
+        String token = "1234";
+
+        //when
+        ResponseEntity<? super ResponseDto> response = authService.logOut(token);
+        boolean existsByToken = jwtBlackListJpaRepository.existsByToken(token);
+        //then
+        Assertions.assertThat(existsByToken).isTrue();
+        Assertions.assertThat(response.getBody())
+                .extracting("code", "message")
+                .containsExactly(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
+    }
     private static User createUser(String email) {
         return User.builder().name("user").email(email).build();
     }

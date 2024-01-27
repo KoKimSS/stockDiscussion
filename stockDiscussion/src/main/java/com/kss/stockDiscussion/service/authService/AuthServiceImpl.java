@@ -7,9 +7,9 @@ import com.kss.stockDiscussion.domain.certification.Certification;
 import com.kss.stockDiscussion.domain.jwtBlackList.JwtBlackList;
 import com.kss.stockDiscussion.domain.user.User;
 import com.kss.stockDiscussion.provider.EmailProvider;
-import com.kss.stockDiscussion.repository.certificationRepository.CertificationRepository;
-import com.kss.stockDiscussion.repository.jwtBlackListRepository.JwtBlackListRepository;
-import com.kss.stockDiscussion.repository.userRepository.UserRepository;
+import com.kss.stockDiscussion.repository.certificationRepository.CertificationJpaRepository;
+import com.kss.stockDiscussion.repository.jwtBlackListRepository.JwtBlackListJpaRepository;
+import com.kss.stockDiscussion.repository.userRepository.UserJpaRepository;
 import com.kss.stockDiscussion.web.dto.request.auth.CheckCertificationRequestDto;
 import com.kss.stockDiscussion.web.dto.request.auth.EmailCertificationRequestDto;
 import com.kss.stockDiscussion.web.dto.request.auth.EmailCheckRequestDto;
@@ -26,7 +26,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.transaction.Transactional;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -35,17 +34,17 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService{
 
-    private final UserRepository userRepository;
+    private final UserJpaRepository userJpaRepository;
     private final EmailProvider emailProvider;
-    private final CertificationRepository certificationRepository;
+    private final CertificationJpaRepository certificationJpaRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final JwtBlackListRepository jwtBlackListRepository;
+    private final JwtBlackListJpaRepository jwtBlackListJpaRepository;
     public static final int TimeValid = 2;
     @Override
     public ResponseEntity<? super EmailCheckResponseDto> emailCheck(EmailCheckRequestDto dto) {
         try {
             String email = dto.getEmail();
-            boolean isExistEmail = userRepository.existsByEmail(email);
+            boolean isExistEmail = userJpaRepository.existsByEmail(email);
             if(isExistEmail) return EmailCheckResponseDto.duplicateEmail();
         } catch (Exception exception) {
             exception.printStackTrace();
@@ -59,20 +58,20 @@ public class AuthServiceImpl implements AuthService{
         try {
             String email = dto.getEmail();
 
-            boolean isExistEmail = userRepository.existsByEmail(email);
+            boolean isExistEmail = userJpaRepository.existsByEmail(email);
             if(isExistEmail) return EmailCertificationResponseDto.duplicateEmail();
 
             //기존에 인증시도 기록이 있으면 삭제하고 생성
-            Optional<Certification> existByEmail = certificationRepository.findByEmail(email);
+            Optional<Certification> existByEmail = certificationJpaRepository.findByEmail(email);
             if(existByEmail.isPresent()){
-                certificationRepository.delete(existByEmail.get());
+                certificationJpaRepository.delete(existByEmail.get());
             }
             String certificationNumber = createCertificationNumber();
             boolean isEmailSendSuccessful = emailProvider.sendCertificationMail(email, certificationNumber);
             if(!isEmailSendSuccessful) return EmailCertificationResponseDto.mailSendFail();
 
             Certification certification = Certification.builder().email(email).certificationNumber(certificationNumber).build();
-            certificationRepository.save(certification);
+            certificationJpaRepository.save(certification);
         } catch (Exception exception) {
             exception.printStackTrace();
             return ResponseDto.databaseError();
@@ -87,7 +86,7 @@ public class AuthServiceImpl implements AuthService{
             String certificationNumber = dto.getCertificationNumber();
             LocalDateTime certificateTime = dto.getCertificateTime();
 
-            Optional<Certification> byUserEmail = certificationRepository.findByEmail(email);
+            Optional<Certification> byUserEmail = certificationJpaRepository.findByEmail(email);
             if(!byUserEmail.isPresent()) return CheckCertificationResponseDto.certificationFail();
 
             Certification certification = byUserEmail.get();
@@ -112,11 +111,11 @@ public class AuthServiceImpl implements AuthService{
 
         try {
             String email = dto.getEmail();
-            boolean existsByEmail = userRepository.existsByEmail(email);
+            boolean existsByEmail = userJpaRepository.existsByEmail(email);
             if(existsByEmail) return SignUpResponseDto.duplicateEmail();
 
             String certificationNumber = dto.getCertificationNumber();
-            Optional<Certification> optionalCertificationByEmail = certificationRepository.findByEmail(email);
+            Optional<Certification> optionalCertificationByEmail = certificationJpaRepository.findByEmail(email);
 
             if(!optionalCertificationByEmail.isPresent()) SignUpResponseDto.certificationFail();
             Certification certificationByEmail = optionalCertificationByEmail.get();
@@ -133,8 +132,8 @@ public class AuthServiceImpl implements AuthService{
                     .imgPath(dto.getImgPath())
                     .build();
 
-            userRepository.save(user);
-            certificationRepository.deleteByEmail(email);
+            userJpaRepository.save(user);
+            certificationJpaRepository.deleteByEmail(email);
         } catch (Exception exception) {
             exception.printStackTrace();
             return ResponseDto.databaseError();
@@ -143,13 +142,16 @@ public class AuthServiceImpl implements AuthService{
     }
 
     @Override
-    public ResponseEntity<?super ResponseDto> logOut(HttpServletRequest request) {
-        String token = request.getHeader(JwtProperties.HEADER_STRING)
-                .replace(JwtProperties.TOKEN_PREFIX, "");
-        boolean existsByToken = jwtBlackListRepository.existsByToken(token);
-        if(existsByToken) return ResponseDto.validationFail();
+    public ResponseEntity<? super ResponseDto> logOut(String token) {
+        boolean existsByToken = jwtBlackListJpaRepository.existsByToken(token);
+
+        if (existsByToken) {
+            return ResponseDto.certificationFail();
+        }
+
         JwtBlackList jwtBlackList = JwtBlackList.builder().token(token).build();
-        jwtBlackListRepository.save(jwtBlackList);
+        jwtBlackListJpaRepository.save(jwtBlackList);
+
         ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
         return ResponseEntity.status(HttpStatus.OK).body(responseBody);
     }

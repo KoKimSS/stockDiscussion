@@ -1,5 +1,17 @@
 package com.kss.stockDiscussion.domain.like;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
+import java.util.stream.Stream;
+
 public enum LikeType {
-    POSTER,REPLY
+    POSTER,REPLY;
+
+    @JsonCreator
+    public static LikeType parsing(String inputValue) {
+        return Stream.of(LikeType.values())
+                .filter(likeType -> likeType.toString().equals(inputValue.toUpperCase()))
+                .findFirst()
+                .orElse(null);
+    }
 }

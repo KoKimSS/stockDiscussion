@@ -1,7 +1,6 @@
 package com.kss.stockDiscussion.repository.userRepository;
 
 import com.kss.stockDiscussion.domain.user.User;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +14,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class UserRepositoryTest {
+class UserJpaRepositoryTest {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserJpaRepository userJpaRepository;
 
     @DisplayName("이메일로 유저를 찾는다")
     @Test
@@ -26,10 +25,10 @@ class UserRepositoryTest {
         //given
         String email = "exist@email.com";
         User user = User.builder().email(email).build();
-        userRepository.save(user);
+        userJpaRepository.save(user);
 
         //when
-        User userByEmail = userRepository.findByEmail(email).get();
+        User userByEmail = userJpaRepository.findByEmail(email).get();
 
         //then
         assertThat(userByEmail).isEqualTo(user);
@@ -41,10 +40,10 @@ class UserRepositoryTest {
         //given
         String email = "email@email.com";
         User user = User.builder().email(email).build();
-        userRepository.save(user);
+        userJpaRepository.save(user);
 
         //when
-        boolean existsByEmail = userRepository.existsByEmail(email);
+        boolean existsByEmail = userJpaRepository.existsByEmail(email);
 
         //then
         assertTrue(existsByEmail);

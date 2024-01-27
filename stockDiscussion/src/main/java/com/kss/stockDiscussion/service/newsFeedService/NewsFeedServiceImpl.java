@@ -6,8 +6,8 @@ import com.kss.stockDiscussion.domain.newsFeed.NewsFeed;
 import com.kss.stockDiscussion.domain.newsFeed.NewsFeedType;
 import com.kss.stockDiscussion.domain.poster.Poster;
 import com.kss.stockDiscussion.domain.user.User;
-import com.kss.stockDiscussion.repository.followRepository.FollowRepository;
-import com.kss.stockDiscussion.repository.newsFeedRepository.NewsFeedRepository;
+import com.kss.stockDiscussion.repository.followRepository.FollowJpaRepository;
+import com.kss.stockDiscussion.repository.newsFeedRepository.NewsFeedJpaRepository;
 import com.kss.stockDiscussion.web.dto.request.newsFeed.CreateNewsFeedRequestDto;
 import com.kss.stockDiscussion.web.dto.request.newsFeed.GetMyNewsFeedRequestDto;
 import com.kss.stockDiscussion.web.dto.response.ResponseDto;
@@ -34,8 +34,8 @@ import static com.kss.stockDiscussion.domain.newsFeed.NewsFeedType.MY_LIKE;
 public class NewsFeedServiceImpl implements NewsFeedService {
 
     private final NewsFeedMapper newsFeedMapper;
-    private final NewsFeedRepository newsFeedRepository;
-    private final FollowRepository followRepository;
+    private final NewsFeedJpaRepository newsFeedJpaRepository;
+    private final FollowJpaRepository followJpaRepository;
 
     @Override
     public ResponseEntity<? super GetMyNewsFeedResponseDto> getMyNewsFeeds(GetMyNewsFeedRequestDto dto) {
@@ -45,7 +45,7 @@ public class NewsFeedServiceImpl implements NewsFeedService {
             int page = dto.getPage();
             int size = dto.getSize();
             Pageable pageable = PageRequest.of(page, size);
-            Page<NewsFeed> newsFeedPage = newsFeedRepository.findByUserId(userId, pageable);
+            Page<NewsFeed> newsFeedPage = newsFeedJpaRepository.findByUserId(userId, pageable);
             newsFeedDtoPage = newsFeedPage.map(newsFeedMapper::toGetMyNewsFeedDto);
         } catch (Exception exception) {
             exception.printStackTrace();
@@ -67,7 +67,7 @@ public class NewsFeedServiceImpl implements NewsFeedService {
             if (isValidRequestDto(activityType, relatedUser,poster)) {
                 return CreateNewsFeedResponseDto.validationFail();
             }
-            List<Follow> followList = followRepository.findByFollowingId(user.getId());
+            List<Follow> followList = followJpaRepository.findByFollowingId(user.getId());
             List<NewsFeed> newsFeedList = createFollowersNewsFeedList(user, followersNewsFeedType, followList, poster, relatedUser);
 
             //내가 한 활동의 관련된 사람 뉴스피드 추가 ( POST 인 경우 관련유저 없음)
@@ -80,7 +80,7 @@ public class NewsFeedServiceImpl implements NewsFeedService {
                         .build();
                 newsFeedList.add(newsFeed);
             }
-            newsFeedRepository.saveAll(newsFeedList);
+            newsFeedJpaRepository.saveAll(newsFeedList);
         } catch (Exception exception) {
             exception.printStackTrace();
             CreateNewsFeedResponseDto.databaseError();

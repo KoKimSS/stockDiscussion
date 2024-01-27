@@ -4,9 +4,17 @@ import com.kss.stockDiscussion.config.auth.PrincipalDetails;
 import com.kss.stockDiscussion.domain.user.User;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 
+@Component
 public class JwtUtil {
+
+    public Long getUserId(){
+        return findUserFromAuth().getId();
+    }
+
     public static User findUserFromAuth() {
         Authentication authentication = getAuthentication();
         if (!isValidAuthentication(authentication)) return null;

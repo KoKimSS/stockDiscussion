@@ -1,5 +1,6 @@
 package com.kss.stockDiscussion.web.dto.request.auth;
 
+import com.kss.stockDiscussion.common.ValidationMessage;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,8 +12,9 @@ import javax.validation.constraints.NotBlank;
 @Getter
 @NoArgsConstructor
 public class EmailCertificationRequestDto {
-    @NotBlank
-    @Email
+
+    @Email(message = ValidationMessage.NOT_EMAIL)
+    @NotBlank(message = ValidationMessage.NOT_BLANK_EMAIL)
     private String email;
 
     @Builder

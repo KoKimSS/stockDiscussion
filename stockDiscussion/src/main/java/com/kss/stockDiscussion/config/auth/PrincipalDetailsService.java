@@ -1,7 +1,7 @@
 package com.kss.stockDiscussion.config.auth;
 
 import com.kss.stockDiscussion.domain.user.User;
-import com.kss.stockDiscussion.repository.userRepository.UserRepository;
+import com.kss.stockDiscussion.repository.userRepository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -17,14 +17,14 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class PrincipalDetailsService implements UserDetailsService {
-    private final UserRepository userRepository;
+    private final UserJpaRepository userJpaRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         System.out.println("loadUserByUsername 발동");
         System.out.println("email = " + email);
         
-        Optional<User> optionalUser = userRepository.findByEmail(email);
+        Optional<User> optionalUser = userJpaRepository.findByEmail(email);
         if(!optionalUser.isPresent()){
             System.out.println("유저가 존재하지 않음");
             return null;

@@ -1,8 +1,6 @@
 package com.kss.stockDiscussion.repository.certificationRepository;
 
 import com.kss.stockDiscussion.domain.certification.Certification;
-import com.kss.stockDiscussion.repository.certificationRepository.CertificationRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +15,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @SpringBootTest
 @Transactional
-public class CertificationRepositoryTest {
+public class CertificationJpaRepositoryTest {
     @Autowired
-    private CertificationRepository certificationRepository;
+    private CertificationJpaRepository certificationJpaRepository;
     
     @Test
     @DisplayName("이메일로 이메일 인증 번호 찾기")
@@ -30,10 +28,10 @@ public class CertificationRepositoryTest {
         Certification certification = Certification.builder().certificationNumber(number)
                 .email(email)
                 .build();
-        certificationRepository.save(certification);
+        certificationJpaRepository.save(certification);
 
         //when
-        Certification findByEmail = certificationRepository.findByEmail(email).get();
+        Certification findByEmail = certificationJpaRepository.findByEmail(email).get();
 
         //then
         assertThat(findByEmail).isEqualTo(certification);
@@ -48,11 +46,11 @@ public class CertificationRepositoryTest {
         Certification certification = Certification.builder().certificationNumber(number)
                 .email(email)
                 .build();
-        certificationRepository.save(certification);
+        certificationJpaRepository.save(certification);
         //when
-        certificationRepository.deleteByEmail(email);
+        certificationJpaRepository.deleteByEmail(email);
         //then
-        Optional<Certification> byEmail = certificationRepository.findByEmail(email);
+        Optional<Certification> byEmail = certificationJpaRepository.findByEmail(email);
         assertFalse(byEmail.isPresent(), "이메일로 생성된 인증이 삭제되었어야 합니다.");
     }
 }

@@ -6,9 +6,9 @@ import com.kss.stockDiscussion.domain.like.LikeType;
 import com.kss.stockDiscussion.domain.poster.Poster;
 import com.kss.stockDiscussion.domain.reply.Reply;
 import com.kss.stockDiscussion.domain.user.User;
-import com.kss.stockDiscussion.repository.posterRepository.PosterRepository;
-import com.kss.stockDiscussion.repository.replyRepository.ReplyRepository;
-import com.kss.stockDiscussion.repository.userRepository.UserRepository;
+import com.kss.stockDiscussion.repository.posterRepository.PosterJpaRepository;
+import com.kss.stockDiscussion.repository.replyRepository.ReplyJpaRepository;
+import com.kss.stockDiscussion.repository.userRepository.UserJpaRepository;
 import com.kss.stockDiscussion.web.dto.request.likes.CreateLikesRequestDto;
 import com.kss.stockDiscussion.web.dto.response.likes.CreateLikesResponseDto;
 import org.assertj.core.api.Assertions;
@@ -29,22 +29,22 @@ class LikesServiceTest {
     private LikesService likesService;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserJpaRepository userJpaRepository;
     @Autowired
-    private PosterRepository posterRepository;
+    private PosterJpaRepository posterJpaRepository;
     @Autowired
-    private ReplyRepository replyRepository;
+    private ReplyJpaRepository replyJpaRepository;
 
     @DisplayName("라이크 종류가 포스터인 경우")
     @Test
     public void createLikesWithTypePoster() throws Exception {
         //given
         User user = createUser("user");
-        userRepository.save(user);
+        userJpaRepository.save(user);
         Poster poster = createPoster("포스터");
-        posterRepository.save(poster);
+        posterJpaRepository.save(poster);
         Reply reply = createReply("리플", user, poster);
-        replyRepository.save(reply);
+        replyJpaRepository.save(reply);
         LikeType type = LikeType.POSTER;
         CreateLikesRequestDto requestDto = getCreateLikesRequestDtoBuilder(type, user.getId(), null, poster.getId());
 
@@ -64,11 +64,11 @@ class LikesServiceTest {
     public void createLikesWithTypeReply() throws Exception {
         //given
         User user = createUser("user");
-        userRepository.save(user);
+        userJpaRepository.save(user);
         Poster poster = createPoster("포스터");
-        posterRepository.save(poster);
+        posterJpaRepository.save(poster);
         Reply reply = createReply("리플", user, poster);
-        replyRepository.save(reply);
+        replyJpaRepository.save(reply);
         LikeType type = LikeType.REPLY;
         CreateLikesRequestDto requestDto = getCreateLikesRequestDtoBuilder(type, user.getId(), reply.getId(), poster.getId());
 

@@ -1,5 +1,6 @@
 package com.kss.stockDiscussion.web.dto.request.auth;
 
+import com.kss.stockDiscussion.common.ValidationMessage;
 import com.kss.stockDiscussion.web.dto.request.RequestDto;
 import lombok.Builder;
 import lombok.Data;
@@ -9,27 +10,29 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
+import static com.kss.stockDiscussion.common.ValidationMessage.*;
+
 @Data
 @NoArgsConstructor
 public class SignUpRequestDto extends RequestDto {
 
-    @NotBlank
-    @Email
+    @NotBlank(message = NOT_BLANK_EMAIL)
+    @Email(message = NOT_EMAIL)
     private String email;
 
-    @NotBlank
-    @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*[0-9])[a-zA-Z0-9]{8,13}$")
+    @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*[0-9])[a-zA-Z0-9]{8,13}$"
+    ,message = NOT_PASSWORD)
     private String password;
 
-    @NotBlank
+    @NotBlank(message = NOT_BLANK_NAME)
     private String name;
-    @NotBlank
+    @NotBlank(message = NOT_BLANK_IMAGE)
     private String imgPath;
 
-    @NotBlank
+    @NotBlank(message = NOT_BLANK_INTRO)
     private String introduction;
 
-    @NotBlank
+    @NotBlank(message = NOT_BLANK_TOKEN)
     private String certificationNumber;
 
     @Builder

@@ -4,8 +4,8 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.kss.stockDiscussion.config.auth.PrincipalDetails;
 import com.kss.stockDiscussion.domain.user.User;
-import com.kss.stockDiscussion.repository.jwtBlackListRepository.JwtBlackListRepository;
-import com.kss.stockDiscussion.repository.userRepository.UserRepository;
+import com.kss.stockDiscussion.repository.jwtBlackListRepository.JwtBlackListJpaRepository;
+import com.kss.stockDiscussion.repository.userRepository.UserJpaRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,7 +15,6 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -29,13 +28,13 @@ import java.util.Optional;
 @Slf4j
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
-    private final UserRepository userRepository;
-    private final JwtBlackListRepository jwtBlackListRepository;
+    private final UserJpaRepository userJpaRepository;
+    private final JwtBlackListJpaRepository jwtBlackListJpaRepository;
 
-    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, UserRepository userRepository,JwtBlackListRepository jwtBlackListRepository) {
+    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, UserJpaRepository userJpaRepository, JwtBlackListJpaRepository jwtBlackListJpaRepository) {
         super(authenticationManager);
-        this.userRepository=userRepository;
-        this.jwtBlackListRepository = jwtBlackListRepository;
+        this.userJpaRepository = userJpaRepository;
+        this.jwtBlackListJpaRepository = jwtBlackListJpaRepository;
     }
 
     /**
@@ -52,7 +51,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         System.out.println("header : " + header);
         String token = request.getHeader(JwtProperties.HEADER_STRING)
                 .replace(JwtProperties.TOKEN_PREFIX, "");
-        boolean isBlackListToken = jwtBlackListRepository.existsByToken(token);
+        boolean isBlackListToken = jwtBlackListJpaRepository.existsByToken(token);
         if(isBlackListToken){
             chain.doFilter(request,response);
             return;
@@ -65,7 +64,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         System.out.println("email = " + email);
 
         if (email != null) {
-            Optional<User> userByMail = userRepository.findByEmail(email);
+            Optional<User> userByMail = userJpaRepository.findByEmail(email);
             if(!userByMail.isPresent()){
                 log.info("회원가입 유저 없음");
                 chain.doFilter(request, response);

@@ -27,7 +27,6 @@ public class User extends BaseTimeEntity {
     private String name;
     private String introduction;
     private String imgPath;
-
     private String roles; //USER, ADMIN
     @OneToMany(mappedBy = "following")
     private List<Follow> followers = new ArrayList<>();
@@ -41,7 +40,8 @@ public class User extends BaseTimeEntity {
     private List<Likes> likesList = new ArrayList<>();
 
     @Builder
-    public User(String email, String password, String name, String introduction, String imgPath) {
+    private User(Long id,String email, String password, String name, String introduction, String imgPath) {
+        this.id = id;
         this.email = email;
         this.password = password;
         this.name = name;

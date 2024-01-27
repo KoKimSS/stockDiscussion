@@ -4,8 +4,8 @@ import com.kss.stockDiscussion.domain.newsFeed.NewsFeed;
 import com.kss.stockDiscussion.domain.newsFeed.NewsFeedType;
 import com.kss.stockDiscussion.domain.poster.Poster;
 import com.kss.stockDiscussion.domain.user.User;
-import com.kss.stockDiscussion.repository.posterRepository.PosterRepository;
-import com.kss.stockDiscussion.repository.userRepository.UserRepository;
+import com.kss.stockDiscussion.repository.posterRepository.PosterJpaRepository;
+import com.kss.stockDiscussion.repository.userRepository.UserJpaRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,17 +15,20 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import javax.transaction.Transactional;
+
 import static java.util.Arrays.asList;
 
 @SpringBootTest
-class NewsFeedRepositoryTest {
+@Transactional
+class NewsFeedJpaRepositoryTest {
 
     @Autowired
-    NewsFeedRepository newsFeedRepository;
+    NewsFeedJpaRepository newsFeedJpaRepository;
     @Autowired
-    private UserRepository userRepository;
+    private UserJpaRepository userJpaRepository;
     @Autowired
-    private PosterRepository posterRepository;
+    private PosterJpaRepository posterJpaRepository;
 
     @DisplayName("유저 아이디로 뉴스피드 페이지를 찾는다.")
     @Test
@@ -35,11 +38,11 @@ class NewsFeedRepositoryTest {
         User activityUser1 = getUser("활동 유저1");
         User activityUser2 = getUser("활동 유저2");
         User activityUser3 = getUser("활동 유저3");
-        userRepository.saveAll(asList(user, activityUser1, activityUser2, activityUser3));
+        userJpaRepository.saveAll(asList(user, activityUser1, activityUser2, activityUser3));
 
         Poster userPoster = getPoster(user, "userPoster");
         Poster activityUserPoster = getPoster(activityUser1, "activityUserPoster");
-        posterRepository.saveAll(asList(userPoster, activityUserPoster));
+        posterJpaRepository.saveAll(asList(userPoster, activityUserPoster));
 
         NewsFeed newsFeed_MY_REPLY = getNewsFeed(user, activityUser1, userPoster,NewsFeedType.MY_REPLY,null);
         NewsFeed newsFeed_MY_LIKE = getNewsFeed(user, activityUser1, userPoster,NewsFeedType.MY_LIKE,null);
@@ -51,9 +54,9 @@ class NewsFeedRepositoryTest {
         Pageable pageable1 = PageRequest.of(1, size);
 
         //when
-        newsFeedRepository.saveAll(asList(newsFeed_MY_REPLY, newsFeed_MY_LIKE, newsFeed_MY_FOLLOW, newsFeed_FOLLOWING_REPLY));
-        Page<NewsFeed> page1 = newsFeedRepository.findByUserId(user.getId(), pageable0);
-        Page<NewsFeed> page2 = newsFeedRepository.findByUserId(user.getId(), pageable1);
+        newsFeedJpaRepository.saveAll(asList(newsFeed_MY_REPLY, newsFeed_MY_LIKE, newsFeed_MY_FOLLOW, newsFeed_FOLLOWING_REPLY));
+        Page<NewsFeed> page1 = newsFeedJpaRepository.findByUserId(user.getId(), pageable0);
+        Page<NewsFeed> page2 = newsFeedJpaRepository.findByUserId(user.getId(), pageable1);
 
         //then
         Assertions.assertThat(page1.getTotalElements()).isEqualTo(4);
