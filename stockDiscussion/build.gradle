@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '2.7.13'
 	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+	id "org.asciidoctor.jvm.convert" version "3.3.2"
 }
 
 group = 'com.kss'
@@ -15,6 +16,7 @@ configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
+	asciidoctorExt
 }
 
 repositories {
@@ -23,29 +25,36 @@ repositories {
 
 dependencies {
 
-	testImplementation 'junit:junit:4.13.1'
-	testImplementation 'junit:junit:4.13.1'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	//DB
-	runtimeOnly 'com.h2database:h2'
-	runtimeOnly 'com.mysql:mysql-connector-j'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	//Security
-	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	//email
-	implementation 'org.springframework.boot:spring-boot-starter-mail'
-	//JWT
-	implementation 'com.auth0:java-jwt:4.4.0'
-	//web
+	//SpringBoot
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
+	// DB
+	runtimeOnly 'com.h2database:h2'
+	runtimeOnly 'com.mysql:mysql-connector-j'
+
+
+	//JWT
+	implementation 'com.auth0:java-jwt:4.4.0'
+
+	//lombok
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 
-	testImplementation 'org.springframework.security:spring-security-test'
+	//test
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation 'junit:junit:4.13.1'
+
+	//RestDocs
+	asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 }
 
 tasks.named('bootBuildImage') {
@@ -54,4 +63,30 @@ tasks.named('bootBuildImage') {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+ext { // 전역 변수
+	snippetsDir = file('build/generated-snippets')
+}
+
+test {
+	outputs.dir snippetsDir
+}
+
+asciidoctor {
+	inputs.dir snippetsDir
+	configurations 'asciidoctorExt'
+
+	sources { // 특정 파일만 html로 만든다.
+		include("**/index.adoc")
+	}
+	baseDirFollowsSourceFile() // 다른 adoc 파일을 include 할 때 경로를 baseDir로 맞춘다.
+	dependsOn test
+}
+
+bootJar {
+	dependsOn asciidoctor
+	from("${asciidoctor.outputDir}") {
+		into 'static/docs'
+	}
 }

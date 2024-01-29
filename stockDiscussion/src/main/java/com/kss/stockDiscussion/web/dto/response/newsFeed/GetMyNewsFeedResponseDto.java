@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 public class GetMyNewsFeedResponseDto extends ResponseDto {
     private final Page<GetMyNewsFeedDto> newsFeedPage;
     public GetMyNewsFeedResponseDto(Page<GetMyNewsFeedDto> newsFeedPage) {
+
         this.newsFeedPage = newsFeedPage;
     }
 

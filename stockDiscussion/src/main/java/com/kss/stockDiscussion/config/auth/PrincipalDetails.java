@@ -16,7 +16,6 @@ public class PrincipalDetails implements UserDetails {
 
     private final User user;
 
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> authorities = new ArrayList<>();
@@ -28,7 +27,6 @@ public class PrincipalDetails implements UserDetails {
 
     @Override
     public String getPassword() {
-        System.out.println("패스워드는"+user.getPassword());
         return user.getPassword();
     }
 

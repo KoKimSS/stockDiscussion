@@ -2,10 +2,7 @@ package com.kss.stockDiscussion.web.controller;
 
 import com.kss.stockDiscussion.config.jwt.JwtProperties;
 import com.kss.stockDiscussion.service.authService.AuthService;
-import com.kss.stockDiscussion.web.dto.request.auth.CheckCertificationRequestDto;
-import com.kss.stockDiscussion.web.dto.request.auth.EmailCertificationRequestDto;
-import com.kss.stockDiscussion.web.dto.request.auth.EmailCheckRequestDto;
-import com.kss.stockDiscussion.web.dto.request.auth.SignUpRequestDto;
+import com.kss.stockDiscussion.web.dto.request.auth.*;
 import com.kss.stockDiscussion.web.dto.response.ResponseDto;
 import com.kss.stockDiscussion.web.dto.response.auth.CheckCertificationResponseDto;
 import com.kss.stockDiscussion.web.dto.response.auth.EmailCertificationResponseDto;
@@ -46,10 +43,14 @@ public class AuthController {
 
     @PostMapping("/check-certification")
     public ResponseEntity<? super CheckCertificationResponseDto> checkCertification(
-            @RequestBody @Valid CheckCertificationRequestDto requestBody
+            @RequestBody @Valid CheckCertificationUserRequestDto requestBody
     ) {
-        requestBody.setCertificateTime(LocalDateTime.now());
-        ResponseEntity<? super CheckCertificationResponseDto> response = authService.checkCertification(requestBody);
+        CheckCertificationRequestDto requestDto = CheckCertificationRequestDto.builder()
+                .email(requestBody.getEmail())
+                .certificationNumber(requestBody.getCertificationNumber())
+                .certificateTime(LocalDateTime.now())
+                .build();
+        ResponseEntity<? super CheckCertificationResponseDto> response = authService.checkCertification(requestDto);
         return response;
     }
 

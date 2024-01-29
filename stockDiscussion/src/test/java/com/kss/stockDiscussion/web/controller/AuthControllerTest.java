@@ -2,18 +2,29 @@ package com.kss.stockDiscussion.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kss.stockDiscussion.common.ResponseCode;
+import com.kss.stockDiscussion.common.ResponseMessage;
 import com.kss.stockDiscussion.common.ValidationMessage;
+import com.kss.stockDiscussion.restDocs.AbstractRestDocsTests;
 import com.kss.stockDiscussion.service.authService.AuthService;
-import com.kss.stockDiscussion.web.dto.request.auth.CheckCertificationRequestDto;
-import com.kss.stockDiscussion.web.dto.request.auth.EmailCertificationRequestDto;
-import com.kss.stockDiscussion.web.dto.request.auth.EmailCheckRequestDto;
-import com.kss.stockDiscussion.web.dto.request.auth.SignUpRequestDto;
+import com.kss.stockDiscussion.web.dto.request.auth.*;
+import com.kss.stockDiscussion.web.dto.response.ResponseDto;
+import com.kss.stockDiscussion.web.dto.response.auth.CheckCertificationResponseDto;
+import com.kss.stockDiscussion.web.dto.response.auth.EmailCertificationResponseDto;
+import com.kss.stockDiscussion.web.dto.response.auth.EmailCheckResponseDto;
+import com.kss.stockDiscussion.web.dto.response.auth.SignUpResponseDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -22,7 +33,14 @@ import org.springframework.test.web.servlet.MockMvc;
 import javax.annotation.security.RunAs;
 
 import static com.kss.stockDiscussion.common.ResponseCode.*;
+import static com.kss.stockDiscussion.common.ResponseMessage.SUCCESS;
 import static com.kss.stockDiscussion.common.ValidationMessage.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -30,11 +48,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = AuthController.class)
-@WithMockUser
-class AuthControllerTest {
+class AuthControllerTest extends AbstractRestDocsTests {
 
-    @Autowired
-    private MockMvc mockMvc;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -50,15 +65,33 @@ class AuthControllerTest {
                 .email("seungsu@gmail.com")
                 .build();
 
+        BDDMockito.doReturn(EmailCheckResponseDto.success()).when(authService)
+                .emailCheck(any(EmailCheckRequestDto.class));
+
         // when
         mockMvc.perform(
                         post("/api/auth/email-check")
-                                .with(csrf())
                                 .content(objectMapper.writeValueAsString(requestDto))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(ResponseCode.SUCCESS))
+                .andExpect(jsonPath("$.message").value(SUCCESS))
+                .andDo(document("email-check",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("email").type(JsonFieldType.STRING)
+                                        .description("이메일")
+                        ),
+                        responseFields(
+                                fieldWithPath("code").type(JsonFieldType.STRING)
+                                        .description(ResponseCode.SUCCESS),
+                                fieldWithPath("message").type(JsonFieldType.STRING)
+                                        .description(SUCCESS)
+                        )
+                ));
     }
 
     @DisplayName("이메일 중복을 확인할 때 이메일은 필수 값이다.")
@@ -72,7 +105,6 @@ class AuthControllerTest {
         // when
         mockMvc.perform(
                         post("/api/auth/email-check")
-                                .with(csrf())
                                 .content(objectMapper.writeValueAsString(requestDto))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -93,7 +125,6 @@ class AuthControllerTest {
         // when
         mockMvc.perform(
                         post("/api/auth/email-check")
-                                .with(csrf())
                                 .content(objectMapper.writeValueAsString(requestDto))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -111,15 +142,33 @@ class AuthControllerTest {
                 .email("seungsu@gmail.com")
                 .build();
 
+        BDDMockito.doReturn(EmailCertificationResponseDto.success()).when(authService)
+                .emailCertification(any(EmailCertificationRequestDto.class));
+
         // when
         mockMvc.perform(
                         post("/api/auth/email-certification")
-                                .with(csrf())
                                 .content(objectMapper.writeValueAsString(requestDto))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(ResponseCode.SUCCESS))
+                .andExpect(jsonPath("$.message").value(SUCCESS))
+                .andDo(document("email-certification",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("email").type(JsonFieldType.STRING)
+                                        .description("이메일")
+                        ),
+                        responseFields(
+                                fieldWithPath("code").type(JsonFieldType.STRING)
+                                        .description(ResponseCode.SUCCESS),
+                                fieldWithPath("message").type(JsonFieldType.STRING)
+                                        .description(SUCCESS)
+                        )
+                ));
     }
 
     @DisplayName("이메일로 인증코드 발급 할 때 이메일은 필수 값이다.")
@@ -133,7 +182,6 @@ class AuthControllerTest {
         // when
         mockMvc.perform(
                         post("/api/auth/email-certification")
-                                .with(csrf())
                                 .content(objectMapper.writeValueAsString(requestDto))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -154,7 +202,6 @@ class AuthControllerTest {
         // when
         mockMvc.perform(
                         post("/api/auth/email-certification")
-                                .with(csrf())
                                 .content(objectMapper.writeValueAsString(requestDto))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -168,27 +215,47 @@ class AuthControllerTest {
     @Test
     public void checkCertification() throws Exception {
         //given
-        CheckCertificationRequestDto requestDto = CheckCertificationRequestDto.builder()
+        CheckCertificationUserRequestDto requestDto = CheckCertificationUserRequestDto.builder()
                 .certificationNumber("1234")
                 .email("seungsu@gmail.com")
                 .build();
 
+        BDDMockito.doReturn(CheckCertificationResponseDto.success()).when(authService)
+                .checkCertification(any(CheckCertificationRequestDto.class));
+
         // when
         mockMvc.perform(
                         post("/api/auth/check-certification")
-                                .with(csrf())
                                 .content(objectMapper.writeValueAsString(requestDto))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(ResponseCode.SUCCESS))
+                .andExpect(jsonPath("$.message").value(SUCCESS))
+                .andDo(document("check-certification",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("email").type(JsonFieldType.STRING)
+                                        .description("이메일"),
+                                fieldWithPath("certificationNumber").type(JsonFieldType.STRING)
+                                        .description("인증번호 4자리")
+                        ),
+                        responseFields(
+                                fieldWithPath("code").type(JsonFieldType.STRING)
+                                        .description(ResponseCode.SUCCESS),
+                                fieldWithPath("message").type(JsonFieldType.STRING)
+                                        .description(SUCCESS)
+                        )
+                ));
     }
 
     @DisplayName("인증 코드 확인 할 때 이메일은 필수 값이다.")
     @Test
     public void checkCertificationWithBlankEmail() throws Exception {
         //given
-        CheckCertificationRequestDto requestDto = CheckCertificationRequestDto.builder()
+        CheckCertificationUserRequestDto requestDto = CheckCertificationUserRequestDto.builder()
                 .certificationNumber("1234")
                 .email("")
                 .build();
@@ -196,7 +263,6 @@ class AuthControllerTest {
         // when
         mockMvc.perform(
                         post("/api/auth/check-certification")
-                                .with(csrf())
                                 .content(objectMapper.writeValueAsString(requestDto))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -210,7 +276,7 @@ class AuthControllerTest {
     @Test
     public void checkCertificationWithNotEmail() throws Exception {
         //given
-        CheckCertificationRequestDto requestDto = CheckCertificationRequestDto.builder()
+        CheckCertificationUserRequestDto requestDto = CheckCertificationUserRequestDto.builder()
                 .certificationNumber("1234")
                 .email("JustName")
                 .build();
@@ -218,7 +284,6 @@ class AuthControllerTest {
         // when
         mockMvc.perform(
                         post("/api/auth/check-certification")
-                                .with(csrf())
                                 .content(objectMapper.writeValueAsString(requestDto))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -231,7 +296,7 @@ class AuthControllerTest {
     @Test
     public void checkCertificationWithBlankNumber() throws Exception {
         //given
-        CheckCertificationRequestDto requestDto = CheckCertificationRequestDto.builder()
+        CheckCertificationUserRequestDto requestDto = CheckCertificationUserRequestDto.builder()
                 .certificationNumber("")
                 .email("email@naver.com")
                 .build();
@@ -239,7 +304,6 @@ class AuthControllerTest {
         // when
         mockMvc.perform(
                         post("/api/auth/check-certification")
-                                .with(csrf())
                                 .content(objectMapper.writeValueAsString(requestDto))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -254,13 +318,30 @@ class AuthControllerTest {
     public void Logout() throws Exception {
         //given
         String validToken = "your-valid-token";
+        BDDMockito.doReturn(
+                        ResponseEntity.status(HttpStatus.OK)
+                                .body(new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS))
+                )
+                .when(authService)
+                .logOut(any(String.class));
 
         //when,then
         mockMvc.perform(post("/api/auth/log-out")
                         .header("Authorization", "Bearer " + validToken)
-                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(ResponseCode.SUCCESS))
+                .andExpect(jsonPath("$.message").value(SUCCESS))
+                .andDo(document("logout",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        responseFields(
+                                fieldWithPath("code").type(JsonFieldType.STRING)
+                                        .description(ResponseCode.SUCCESS),
+                                fieldWithPath("message").type(JsonFieldType.STRING)
+                                        .description(ResponseMessage.SUCCESS)
+                        )
+                ));
     }
 
     @DisplayName("로그아웃 수행시 헤더의 토큰값은 필수 이다.")
@@ -272,7 +353,6 @@ class AuthControllerTest {
         //when,then
         mockMvc.perform(post("/api/auth/log-out")
                         .header("Authorization", "")
-                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
     }
@@ -288,13 +368,40 @@ class AuthControllerTest {
                 "imgPath",
                 "1234",
                 "email@email.com");
+        BDDMockito.doReturn(SignUpResponseDto.success()).when(authService)
+                .singUp(any(SignUpRequestDto.class));
 
         //when,then
         mockMvc.perform(post("/api/auth/sign-up")
                         .content(objectMapper.writeValueAsString(requestDto))
-                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(ResponseCode.SUCCESS))
+                .andExpect(jsonPath("$.message").value(SUCCESS))
+                .andDo(document("sign-up",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("email").type(JsonFieldType.STRING)
+                                        .description("이메일"),
+                                fieldWithPath("password").type(JsonFieldType.STRING)
+                                        .description("비밀번호"),
+                                fieldWithPath("name").type(JsonFieldType.STRING)
+                                        .description("이름"),
+                                fieldWithPath("introduction").type(JsonFieldType.STRING)
+                                        .description("자기소개"),
+                                fieldWithPath("imgPath").type(JsonFieldType.STRING)
+                                        .description("이미지 주소"),
+                                fieldWithPath("certificationNumber").type(JsonFieldType.STRING)
+                                        .description("인증번호 4자리")
+                        ),
+                        responseFields(
+                                fieldWithPath("code").type(JsonFieldType.STRING)
+                                        .description(ResponseCode.SUCCESS),
+                                fieldWithPath("message").type(JsonFieldType.STRING)
+                                        .description(ResponseMessage.SUCCESS)
+                        )
+                ));
     }
 
     @DisplayName("회원가입 수행시 이름은 필수 값이다.")
@@ -312,7 +419,6 @@ class AuthControllerTest {
         //when,then
         mockMvc.perform(post("/api/auth/sign-up")
                         .content(objectMapper.writeValueAsString(requestDto))
-                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.code").value(VALIDATION_FAIL))
                 .andExpect(jsonPath("$.message").value(NOT_BLANK_NAME))
@@ -334,7 +440,6 @@ class AuthControllerTest {
         //when,then
         mockMvc.perform(post("/api/auth/sign-up")
                         .content(objectMapper.writeValueAsString(requestDto))
-                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.code").value(VALIDATION_FAIL))
                 .andExpect(jsonPath("$.message").value(NOT_PASSWORD))
@@ -356,7 +461,6 @@ class AuthControllerTest {
         //when,then
         mockMvc.perform(post("/api/auth/sign-up")
                         .content(objectMapper.writeValueAsString(requestDto))
-                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.code").value(VALIDATION_FAIL))
                 .andExpect(jsonPath("$.message").value(NOT_BLANK_INTRO))
@@ -378,7 +482,6 @@ class AuthControllerTest {
         //when,then
         mockMvc.perform(post("/api/auth/sign-up")
                         .content(objectMapper.writeValueAsString(requestDto))
-                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.code").value(VALIDATION_FAIL))
                 .andExpect(jsonPath("$.message").value(NOT_BLANK_IMAGE))
@@ -400,7 +503,6 @@ class AuthControllerTest {
         //when,then
         mockMvc.perform(post("/api/auth/sign-up")
                         .content(objectMapper.writeValueAsString(requestDto))
-                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.code").value(VALIDATION_FAIL))
                 .andExpect(jsonPath("$.message").value(NOT_BLANK_TOKEN))
@@ -422,7 +524,6 @@ class AuthControllerTest {
         //when,then
         mockMvc.perform(post("/api/auth/sign-up")
                         .content(objectMapper.writeValueAsString(requestDto))
-                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.code").value(VALIDATION_FAIL))
                 .andExpect(jsonPath("$.message").value(NOT_EMAIL))

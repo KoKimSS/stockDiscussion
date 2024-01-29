@@ -17,8 +17,16 @@ import com.kss.stockDiscussion.web.dto.request.newsFeed.CreateNewsFeedRequestDto
 import com.kss.stockDiscussion.web.dto.response.ResponseDto;
 import com.kss.stockDiscussion.web.dto.response.likes.CreateLikesResponseDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+
+import javax.transaction.Transactional;
+
+import java.util.Iterator;
+import java.util.Set;
 
 import static com.kss.stockDiscussion.domain.like.Likes.*;
 
@@ -30,6 +38,8 @@ public class LikesServiceImpl implements LikesService{
     private final PosterJpaRepository posterJpaRepository;
     private final ReplyJpaRepository replyJpaRepository;
     private final NewsFeedService newsFeedService;
+    private final RedisTemplate<String, String> redisTemplate; // Inject RedisTemplate
+
 
     @Override
     public ResponseEntity<? super CreateLikesResponseDto> createLikes(CreateLikesRequestDto dto) {
@@ -50,10 +60,10 @@ public class LikesServiceImpl implements LikesService{
             if(likeType == LikeType.REPLY){
                 Reply reply = replyJpaRepository.findById(replyId).get();
                 likesBuilder.reply(reply);
-                reply.incrementLikeCount();
+                addReplyLikesCntToRedis(replyId);
             }
             if(likeType == LikeType.POSTER){
-                poster.incrementLikeCount();
+                addPosterLikesCntToRedis(posterId);
             }
             Likes newLikes = likesBuilder.build();
             likesJpaRepository.save(newLikes);
@@ -73,5 +83,80 @@ public class LikesServiceImpl implements LikesService{
         }
 
         return CreateLikesResponseDto.success();
+    }
+
+    @Transactional
+    @Override
+    public void addReplyLikesCntToRedis(Long replyId){
+        HashOperations<String, String, Object> hashOperations = redisTemplate.opsForHash();
+        String key = "replyId::" + replyId;
+        String hashkey = "replyLikes";
+        System.out.println("reply hash값"+hashOperations.get(key,hashkey));
+        if(hashOperations.get(key,hashkey) == null){
+            hashOperations.put(key,hashkey,String.valueOf(replyJpaRepository.findById(replyId).get().getLikeCount()));
+            hashOperations.increment(key,hashkey,1L);
+            System.out.println(hashOperations.get(key,hashkey));
+        }else {
+            hashOperations.increment(key,hashkey,1L);
+            System.out.println(hashOperations.get(key, hashkey));
+        }
+        System.out.println("Reply 추가");
+    }
+
+    @Transactional
+    @Override
+    public void addPosterLikesCntToRedis(Long posterId){
+        HashOperations<String, String, Object> hashOperations = redisTemplate.opsForHash();
+        String key = "posterId::" + posterId;
+        String hashkey = "posterLikes";
+        System.out.println("poster hash값"+hashOperations.get(key,hashkey));
+        if(hashOperations.get(key,hashkey) == null){
+            int posterLikeCount = posterJpaRepository.findById(posterId).get().getLikeCount();
+            System.out.println("저장된 poster "+posterLikeCount);
+            hashOperations.put(key,hashkey,String.valueOf(posterLikeCount));
+            hashOperations.increment(key,hashkey,1L);
+            System.out.println(hashOperations.get(key,hashkey));
+        }else {
+            hashOperations.increment(key,hashkey,1L);
+            System.out.println(hashOperations.get(key, hashkey));
+        }
+        System.out.println("Poster 추가");
+    }
+
+    @Scheduled(fixedDelay = 1000L*18L)
+    @Transactional
+    @Override
+    public void updateLikesCountByRedis(){
+        String hashkey = "posterLikes";
+        Set<String> Rediskey = redisTemplate.keys("posterId*");
+        Iterator<String> it = Rediskey.iterator();
+        while (it.hasNext()) {
+            String keyPattern = it.next();
+            Long posterId = Long.parseLong(keyPattern.split("::")[1]);
+            if (redisTemplate.opsForHash().get(keyPattern, hashkey) == null){
+                break;
+            }
+            Integer likesCount = Integer.parseInt((String.valueOf(redisTemplate.opsForHash().get(keyPattern, hashkey))));
+            System.out.println("Poster 생성 "+ likesCount);
+            System.out.println("posterId = "+posterId);
+            posterJpaRepository.addLikeCountFromRedis(posterId, likesCount);
+            redisTemplate.opsForHash().delete(keyPattern, hashkey);
+        }
+
+        hashkey = "replyLikes";
+        Rediskey = redisTemplate.keys("replyId*");
+        it = Rediskey.iterator();
+        while (it.hasNext()) {
+            String keyPattern = it.next();
+            Long replyId = Long.parseLong(keyPattern.split("::")[1]);
+            if (redisTemplate.opsForHash().get(keyPattern, hashkey) == null){
+                break;
+            }
+            int likesCount = Integer.parseInt((String.valueOf(redisTemplate.opsForHash().get(keyPattern, hashkey))));
+            System.out.println("Reply 생성 " + likesCount);
+            System.out.println("replyId = "+replyId);
+            replyJpaRepository.addLikeCountFromRedis(replyId, likesCount);
+            redisTemplate.opsForHash().delete(keyPattern, hashkey);
+        }
     }
 }

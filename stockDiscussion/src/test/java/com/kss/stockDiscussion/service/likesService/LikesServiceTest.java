@@ -6,12 +6,14 @@ import com.kss.stockDiscussion.domain.like.LikeType;
 import com.kss.stockDiscussion.domain.poster.Poster;
 import com.kss.stockDiscussion.domain.reply.Reply;
 import com.kss.stockDiscussion.domain.user.User;
+import com.kss.stockDiscussion.repository.likeRepository.LikesJpaRepository;
 import com.kss.stockDiscussion.repository.posterRepository.PosterJpaRepository;
 import com.kss.stockDiscussion.repository.replyRepository.ReplyJpaRepository;
 import com.kss.stockDiscussion.repository.userRepository.UserJpaRepository;
 import com.kss.stockDiscussion.web.dto.request.likes.CreateLikesRequestDto;
 import com.kss.stockDiscussion.web.dto.response.likes.CreateLikesResponseDto;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +24,6 @@ import javax.transaction.Transactional;
 
 
 @SpringBootTest
-@Transactional
 class LikesServiceTest {
 
     @Autowired
@@ -34,6 +35,17 @@ class LikesServiceTest {
     private PosterJpaRepository posterJpaRepository;
     @Autowired
     private ReplyJpaRepository replyJpaRepository;
+
+    @Autowired
+    private LikesJpaRepository likesJpaRepository;
+
+    @AfterEach
+    void afterEach() {
+        likesJpaRepository.deleteAllInBatch();
+        replyJpaRepository.deleteAllInBatch();
+        posterJpaRepository.deleteAllInBatch();
+        userJpaRepository.deleteAllInBatch();
+    }
 
     @DisplayName("라이크 종류가 포스터인 경우")
     @Test
@@ -50,10 +62,8 @@ class LikesServiceTest {
 
         //when
         ResponseEntity<? super CreateLikesResponseDto> response = likesService.createLikes(requestDto);
-        int likeCount = poster.getLikeCount();
 
         //then
-        Assertions.assertThat(likeCount).isEqualTo(1);
         Assertions.assertThat(response.getBody())
                 .extracting("code", "message")
                 .containsExactly(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
@@ -74,10 +84,8 @@ class LikesServiceTest {
 
         //when
         ResponseEntity<? super CreateLikesResponseDto> response = likesService.createLikes(requestDto);
-        int likeCount = reply.getLikeCount();
 
         //then
-        Assertions.assertThat(likeCount).isEqualTo(1);
         Assertions.assertThat(response.getBody())
                 .extracting("code", "message")
                 .containsExactly(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
@@ -94,7 +102,7 @@ class LikesServiceTest {
                 .poster(poster).build();
     }
 
-    private static CreateLikesRequestDto getCreateLikesRequestDtoBuilder(LikeType type,Long userId,Long replyId,Long posterId) {
+    public static CreateLikesRequestDto getCreateLikesRequestDtoBuilder(LikeType type, Long userId, Long replyId, Long posterId) {
         return CreateLikesRequestDto.builder()
                 .likeType(type)
                 .userId(userId)

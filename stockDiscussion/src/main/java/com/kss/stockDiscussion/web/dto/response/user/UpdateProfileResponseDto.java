@@ -21,4 +21,5 @@ public class UpdateProfileResponseDto extends ResponseDto {
         ResponseEntity<ResponseDto> response = ResponseDto.databaseError();
         return response;
     }
+
 }

@@ -20,4 +20,5 @@ public interface ValidationMessage {
     String PAGE_SIZE_POSITIVE = "페이지 사이즈는 양수여야 합니다.";
     String NOT_BLANK_TITLE = "제목은 필수 값 입니다.";
     String NOT_BLANK_CONTENTS = "내용은 필수 값 입니다.";
+    String NOT_BLANK_PASSWORD = "비밀번호는 필수 값 입니다.";
 }

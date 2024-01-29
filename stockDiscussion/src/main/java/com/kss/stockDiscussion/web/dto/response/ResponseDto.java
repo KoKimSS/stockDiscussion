@@ -2,9 +2,9 @@ package com.kss.stockDiscussion.web.dto.response;
 
 import com.kss.stockDiscussion.common.ResponseCode;
 import com.kss.stockDiscussion.common.ResponseMessage;
+import com.kss.stockDiscussion.web.dto.response.auth.EmailCheckResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 public class ResponseDto {
     private String code;
     private String message;
+
 
     public ResponseDto() {
         this.code = ResponseCode.SUCCESS;

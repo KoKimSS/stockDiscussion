@@ -21,13 +21,11 @@ public class Certification extends BaseTimeEntity {
     String email;
     String certificationNumber;
     Boolean isCertified ;
-    private LocalDateTime createdDate;
 
     @Builder
     private Certification(String email,String certificationNumber,LocalDateTime localDateTime){
         this.email = email;
         this.certificationNumber = certificationNumber;
-        this.createdDate = localDateTime;
         this.isCertified = false;
     }
 

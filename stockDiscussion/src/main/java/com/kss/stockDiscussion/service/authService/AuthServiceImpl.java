@@ -2,7 +2,6 @@ package com.kss.stockDiscussion.service.authService;
 
 import com.kss.stockDiscussion.common.ResponseCode;
 import com.kss.stockDiscussion.common.ResponseMessage;
-import com.kss.stockDiscussion.config.jwt.JwtProperties;
 import com.kss.stockDiscussion.domain.certification.Certification;
 import com.kss.stockDiscussion.domain.jwtBlackList.JwtBlackList;
 import com.kss.stockDiscussion.domain.user.User;
@@ -25,7 +24,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -48,7 +46,7 @@ public class AuthServiceImpl implements AuthService{
             if(isExistEmail) return EmailCheckResponseDto.duplicateEmail();
         } catch (Exception exception) {
             exception.printStackTrace();
-            return ResponseDto.databaseError();
+            return EmailCheckResponseDto.databaseError();
         }
         return EmailCheckResponseDto.success();
     }
@@ -133,7 +131,6 @@ public class AuthServiceImpl implements AuthService{
                     .build();
 
             userJpaRepository.save(user);
-            certificationJpaRepository.deleteByEmail(email);
         } catch (Exception exception) {
             exception.printStackTrace();
             return ResponseDto.databaseError();
@@ -152,8 +149,7 @@ public class AuthServiceImpl implements AuthService{
         JwtBlackList jwtBlackList = JwtBlackList.builder().token(token).build();
         jwtBlackListJpaRepository.save(jwtBlackList);
 
-        ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
-        return ResponseEntity.status(HttpStatus.OK).body(responseBody);
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS));
     }
 
     private static boolean isDtoMatchCertification(String email, String certificationNumber, Certification certification) {

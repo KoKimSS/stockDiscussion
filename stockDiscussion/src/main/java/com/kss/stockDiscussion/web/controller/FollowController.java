@@ -23,7 +23,6 @@ public class FollowController {
 
     private final FollowService followService;
 
-
     @PostMapping("/start-follow")
     ResponseEntity<? super StartFollowResponseDto> startFollow(
             @RequestBody @Valid StartFollowRequestDto requestBody,

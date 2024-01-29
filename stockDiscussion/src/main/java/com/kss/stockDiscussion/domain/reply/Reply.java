@@ -29,6 +29,7 @@ public class Reply extends BaseTimeEntity {
         this.contents = contents;
         this.poster = poster;
         this.user = user;
+        likeCount=0;
     }
 
     public void incrementLikeCount(){
