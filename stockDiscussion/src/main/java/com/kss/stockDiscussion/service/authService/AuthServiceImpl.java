@@ -166,6 +166,6 @@ public class AuthServiceImpl implements AuthService{
     private boolean isCertificationTimeValid(Certification certification,LocalDateTime certificateTime) {
         LocalDateTime certificationCreationTime = certification.getCreatedDate();
         Duration duration = Duration.between(certificationCreationTime, certificateTime);
-        return duration.toMinutes() <= TimeValid;
+        return duration.toSeconds() <= TimeValid*60;
     }
 }

@@ -13,7 +13,7 @@ import static javax.persistence.FetchType.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @EqualsAndHashCode(of = {"id"})
-@Table(indexes = @Index(name = "idx_user_id", columnList = "user_id"))
+@Table
 public class NewsFeed extends BaseTimeEntity {
     @Id
     @GeneratedValue

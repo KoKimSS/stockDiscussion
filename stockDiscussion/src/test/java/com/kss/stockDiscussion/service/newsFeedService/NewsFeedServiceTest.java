@@ -3,6 +3,8 @@ package com.kss.stockDiscussion.service.newsFeedService;
 import com.kss.stockDiscussion.common.ResponseCode;
 import com.kss.stockDiscussion.common.ResponseMessage;
 import com.kss.stockDiscussion.domain.follow.Follow;
+import com.kss.stockDiscussion.domain.like.LikeType;
+import com.kss.stockDiscussion.domain.like.Likes;
 import com.kss.stockDiscussion.domain.newsFeed.ActivityType;
 import com.kss.stockDiscussion.domain.newsFeed.NewsFeed;
 import com.kss.stockDiscussion.domain.newsFeed.NewsFeedType;
@@ -10,6 +12,7 @@ import com.kss.stockDiscussion.domain.poster.Poster;
 import com.kss.stockDiscussion.domain.reply.Reply;
 import com.kss.stockDiscussion.domain.user.User;
 import com.kss.stockDiscussion.repository.followRepository.FollowJpaRepository;
+import com.kss.stockDiscussion.repository.likeRepository.LikesJpaRepository;
 import com.kss.stockDiscussion.repository.newsFeedRepository.NewsFeedJpaRepository;
 import com.kss.stockDiscussion.repository.posterRepository.PosterJpaRepository;
 import com.kss.stockDiscussion.repository.replyRepository.ReplyJpaRepository;
@@ -49,9 +52,14 @@ class NewsFeedServiceTest {
     @Autowired
     ReplyJpaRepository replyJpaRepository;
 
+    @Autowired
+    LikesJpaRepository likesJpaRepository;
+
     @BeforeEach
     void setUp() {
-        User user = createUser("user", "user@email");
+        User user = User.builder().name("user")
+                .email("user@email.com")
+                .password("123123kim").build();
         User follower1 = createUser("follower1", "follower1@email");
         User follower2 = createUser("follower2", "follower2@email");
         User posterOwner = createUser("posterOwner", "posterOwner@email");
@@ -65,9 +73,17 @@ class NewsFeedServiceTest {
     @Test
     public void getMyNewsFeeds() throws Exception {
         //given
-        User user = userJpaRepository.findByEmail("user@email").get();
+        User user = userJpaRepository.findByEmail("user@email.com").get();
         String name = user.getName();
         User follower = userJpaRepository.findByEmail("follower1@email").get();
+
+        Poster poster = Poster.builder().title("제목").contents("내용").owner(user)
+                .build();
+        posterJpaRepository.save(poster);
+
+        Likes posterLike = Likes.builder().likeType(LikeType.POSTER).poster(poster).build();
+        likesJpaRepository.save(posterLike);
+
         NewsFeed newsFeed1 = getNewsFeed(follower, FOLLOWING_POST ,user);
         NewsFeed newsFeed2 = getNewsFeed(follower, FOLLOWING_LIKE ,user);
         NewsFeed newsFeed3 = getNewsFeed(follower, FOLLOWING_REPLY ,user);
@@ -121,7 +137,7 @@ class NewsFeedServiceTest {
     public void createNewsFeedWithPOST() throws Exception {
         //given
         ActivityType activityType = ActivityType.POST;
-        User user = userJpaRepository.findByEmail("user@email").get();
+        User user = userJpaRepository.findByEmail("user@email.com").get();
         User follower1 = userJpaRepository.findByEmail("follower1@email").get();
         User follower2 = userJpaRepository.findByEmail("follower2@email").get();
         Poster poster = getPoster(user, "userPoster");
@@ -149,7 +165,7 @@ class NewsFeedServiceTest {
     public void createNewsFeedWithREPLY() throws Exception {
         //given
         ActivityType activityType = ActivityType.REPLY;
-        User user = userJpaRepository.findByEmail("user@email").get();
+        User user = userJpaRepository.findByEmail("user@email.com").get();
         User follower1 = userJpaRepository.findByEmail("follower1@email").get();
         User follower2 = userJpaRepository.findByEmail("follower2@email").get();
         User posterOwner = userJpaRepository.findByEmail("posterOwner@email").get();
@@ -186,7 +202,7 @@ class NewsFeedServiceTest {
     public void createNewsFeedWithFOLLOW() throws Exception {
         //given
         ActivityType activityType = ActivityType.FOLLOW;
-        User user = userJpaRepository.findByEmail("user@email").get();
+        User user = userJpaRepository.findByEmail("user@email.com").get();
         User follower1 = userJpaRepository.findByEmail("follower1@email").get();
         User follower2 = userJpaRepository.findByEmail("follower2@email").get();
         User posterOwner = userJpaRepository.findByEmail("posterOwner@email").get();
@@ -219,7 +235,7 @@ class NewsFeedServiceTest {
     public void createNewsFeedWithLIKE() throws Exception {
         //given
         ActivityType activityType = ActivityType.LIKE;
-        User user = userJpaRepository.findByEmail("user@email").get();
+        User user = userJpaRepository.findByEmail("user@email.com").get();
         User follower1 = userJpaRepository.findByEmail("follower1@email").get();
         User follower2 = userJpaRepository.findByEmail("follower2@email").get();
         User posterOwner = userJpaRepository.findByEmail("posterOwner@email").get();

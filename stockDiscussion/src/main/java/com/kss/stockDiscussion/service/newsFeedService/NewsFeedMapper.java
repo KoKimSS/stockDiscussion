@@ -16,7 +16,7 @@ public class NewsFeedMapper {
         User relatedUser = newsFeed.getRelatedUser();
         Poster relatedPoster = newsFeed.getRelatedPoster();
         NewsFeedType newsFeedType = newsFeed.getNewsFeedType();
-        return  GetMyNewsFeedDto.builder()
+        GetMyNewsFeedDto dto = GetMyNewsFeedDto.builder()
                 .userId(user.getId())
                 .userName(user.getName())
                 .activityUserId(activityUser.getId())
@@ -26,6 +26,8 @@ public class NewsFeedMapper {
                 .relatedPosterId((relatedPoster != null) ? relatedPoster.getId() : null)
                 .relatedPosterName((relatedPoster != null) ? relatedPoster.getTitle() : null)
                 .newsFeedType(newsFeedType).build();
+        System.out.println(dto.getMessage());
+        return dto;
     }
 
 }

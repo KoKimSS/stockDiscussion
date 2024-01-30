@@ -94,7 +94,6 @@ class NewsFeedControllerTest extends AbstractRestDocsTests {
         // when
         mockMvc.perform(
                         MockMvcRequestBuilders.get("/api/newsFeed/get-myNewsFeed")
-                                .with(csrf())
                                 .content(objectMapper.writeValueAsString(requestDto))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -159,7 +158,6 @@ class NewsFeedControllerTest extends AbstractRestDocsTests {
         // when
         mockMvc.perform(
                         MockMvcRequestBuilders.get("/api/newsFeed/get-myNewsFeed")
-                                .with(csrf())
                                 .content(objectMapper.writeValueAsString(requestDto))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -180,7 +178,6 @@ class NewsFeedControllerTest extends AbstractRestDocsTests {
         // when
         mockMvc.perform(
                         MockMvcRequestBuilders.get("/api/newsFeed/get-myNewsFeed")
-                                .with(csrf())
                                 .content(objectMapper.writeValueAsString(requestDto))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -203,7 +200,6 @@ class NewsFeedControllerTest extends AbstractRestDocsTests {
         // when
         mockMvc.perform(
                         MockMvcRequestBuilders.get("/api/newsFeed/get-myNewsFeed")
-                                .with(csrf())
                                 .content(objectMapper.writeValueAsString(requestDto))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -226,7 +222,6 @@ class NewsFeedControllerTest extends AbstractRestDocsTests {
         // when
         mockMvc.perform(
                         MockMvcRequestBuilders.get("/api/newsFeed/get-myNewsFeed")
-                                .with(csrf())
                                 .content(objectMapper.writeValueAsString(requestDto))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )

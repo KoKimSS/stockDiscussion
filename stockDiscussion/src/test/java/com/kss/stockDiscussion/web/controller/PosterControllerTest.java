@@ -89,7 +89,6 @@ class PosterControllerTest extends AbstractRestDocsTests {
         // when
         mockMvc.perform(
                         post("/api/poster/create-poster")
-                                .with(csrf())
                                 .content(objectMapper.writeValueAsString(requestDto))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -129,7 +128,6 @@ class PosterControllerTest extends AbstractRestDocsTests {
         // when
         mockMvc.perform(
                         post("/api/poster/create-poster")
-                                .with(csrf())
                                 .content(objectMapper.writeValueAsString(requestDto))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -151,7 +149,6 @@ class PosterControllerTest extends AbstractRestDocsTests {
         // when
         mockMvc.perform(
                         post("/api/poster/create-poster")
-                                .with(csrf())
                                 .content(objectMapper.writeValueAsString(requestDto))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -173,7 +170,6 @@ class PosterControllerTest extends AbstractRestDocsTests {
         // when
         mockMvc.perform(
                         post("/api/poster/create-poster")
-                                .with(csrf())
                                 .content(objectMapper.writeValueAsString(requestDto))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )

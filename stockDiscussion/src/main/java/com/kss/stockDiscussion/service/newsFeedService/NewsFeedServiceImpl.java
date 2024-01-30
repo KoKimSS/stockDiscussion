@@ -21,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,6 +32,7 @@ import static com.kss.stockDiscussion.domain.newsFeed.NewsFeedType.MY_LIKE;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class NewsFeedServiceImpl implements NewsFeedService {
 
     private final NewsFeedMapper newsFeedMapper;
@@ -46,7 +48,13 @@ public class NewsFeedServiceImpl implements NewsFeedService {
             int size = dto.getSize();
             Pageable pageable = PageRequest.of(page, size);
             Page<NewsFeed> newsFeedPage = newsFeedJpaRepository.findByUserId(userId, pageable);
-            newsFeedDtoPage = newsFeedPage.map(newsFeedMapper::toGetMyNewsFeedDto);
+            long totalElements = newsFeedPage.getTotalElements();
+            int totalPages = newsFeedPage.getTotalPages();
+            System.out.println("totalElements = " + totalElements);
+            System.out.println("totalPages = " + totalPages);
+            System.out.println("뉴스피드 컨텐츠"+newsFeedPage.getContent());
+            newsFeedDtoPage = newsFeedPage.map(newsFeed->newsFeedMapper.toGetMyNewsFeedDto(newsFeed));
+            System.out.println("뉴스피드가져옴");
         } catch (Exception exception) {
             exception.printStackTrace();
             return ResponseDto.databaseError();

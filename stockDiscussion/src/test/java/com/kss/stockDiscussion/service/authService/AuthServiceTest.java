@@ -24,6 +24,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
 
 import javax.transaction.Transactional;
+import java.time.Duration;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -130,7 +131,7 @@ class AuthServiceTest {
         LocalDateTime createdTime = LocalDateTime.of(2024, 1, 1, 0, 0);
         LocalDateTime successTime = LocalDateTime.of(2024, 1, 1, 0, AuthServiceImpl.TimeValid);
 
-        Certification certification = createCertification(email, number, createdTime);
+        Certification certification = createCertification(email, number);
         certificationJpaRepository.save(certification);
 
         CheckCertificationRequestDto successRequest = getCheckCertificationRequestDto(email, number, successTime);
@@ -153,10 +154,9 @@ class AuthServiceTest {
         //given
         String email = "email@naver.com";
         String number = "1234";
-        LocalDateTime createdTime = LocalDateTime.of(2024, 1, 1, 0, 0);
-        LocalDateTime failTime = LocalDateTime.of(2024, 1, 1, 0, AuthServiceImpl.TimeValid + 1);
+        LocalDateTime failTime = LocalDateTime.now().plus(Duration.ofMinutes(AuthServiceImpl.TimeValid+1));
 
-        Certification certification = createCertification(email, number, createdTime);
+        Certification certification = createCertification(email, number);
         certificationJpaRepository.save(certification);
 
         CheckCertificationRequestDto timeExceedRequest = getCheckCertificationRequestDto(email, number, failTime);
@@ -182,7 +182,7 @@ class AuthServiceTest {
         LocalDateTime createdTime = LocalDateTime.of(2024, 1, 1, 0, 0);
         LocalDateTime successTime = LocalDateTime.of(2024, 1, 1, 0, AuthServiceImpl.TimeValid);
 
-        Certification certification = createCertification(email, number, createdTime);
+        Certification certification = createCertification(email, number);
         certificationJpaRepository.save(certification);
 
         CheckCertificationRequestDto wrongEmailRequest = getCheckCertificationRequestDto(wrongEmail, number, successTime);
@@ -209,7 +209,7 @@ class AuthServiceTest {
         LocalDateTime createdTime = LocalDateTime.of(2024, 1, 1, 0, 0);
         LocalDateTime successTime = LocalDateTime.of(2024, 1, 1, 0, AuthServiceImpl.TimeValid);
 
-        Certification certification = createCertification(email, number, createdTime);
+        Certification certification = createCertification(email, number);
         certificationJpaRepository.save(certification);
 
         CheckCertificationRequestDto wrongNumberRequest = getCheckCertificationRequestDto(email, wrongNumber, successTime);
@@ -233,7 +233,7 @@ class AuthServiceTest {
         //given
         String number = "1234";
         String email = "email@naver.com";
-        Certification certification = createCertification(email, number, LocalDateTime.now());
+        Certification certification = createCertification(email, number);
         certificationJpaRepository.save(certification);
         certification.certificated();
         SignUpRequestDto successRequestDto = getSignUpRequestDto(number, email);
@@ -257,7 +257,8 @@ class AuthServiceTest {
         String number = "1234";
         String email = "email@naver.com";
         String wrongEmail = "wrong@naver.com";
-        Certification certification = createCertification(email, number, LocalDateTime.now());
+        Certification certification = createCertification(email, number);
+
         certification.certificated();
         certificationJpaRepository.save(certification);
         SignUpRequestDto wrongEmailRequestDto = getSignUpRequestDto(number, wrongEmail);
@@ -279,7 +280,7 @@ class AuthServiceTest {
         String number = "1234";
         String email = "email@naver.com";
         String wrongNumber = "5678";
-        Certification certification = createCertification(email, number, LocalDateTime.now());
+        Certification certification = createCertification(email, number);
         certificationJpaRepository.save(certification);
         certification.certificated();
         SignUpRequestDto wrongNumberRequestDto = getSignUpRequestDto(wrongNumber, email);
@@ -313,10 +314,10 @@ class AuthServiceTest {
     private static User createUser(String email) {
         return User.builder().name("user").email(email).build();
     }
-    private Certification createCertification(String email, String number, LocalDateTime createdTime) {
+    private Certification createCertification(String email, String number) {
         return Certification.builder().email(email)
                 .certificationNumber(number)
-                .localDateTime(createdTime).build();
+                .build();
     }
 
     private static EmailCheckRequestDto createEmailCheckRequestDto(String email) {

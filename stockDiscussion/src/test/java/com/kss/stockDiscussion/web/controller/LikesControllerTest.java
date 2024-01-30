@@ -41,7 +41,6 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -85,7 +84,6 @@ class LikesControllerTest extends AbstractRestDocsTests {
         // when
         mockMvc.perform(
                         post("/api/likes/create-likes")
-                                .with(csrf())
                                 .content(objectMapper.writeValueAsString(requestDto))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -129,7 +127,6 @@ class LikesControllerTest extends AbstractRestDocsTests {
         // when
         mockMvc.perform(
                         post("/api/likes/create-likes")
-                                .with(csrf())
                                 .content(objectMapper.writeValueAsString(requestDto))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -151,7 +148,6 @@ class LikesControllerTest extends AbstractRestDocsTests {
         // when
         mockMvc.perform(
                         post("/api/likes/create-likes")
-                                .with(csrf())
                                 .content(objectMapper.writeValueAsString(requestDto))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -174,7 +170,6 @@ class LikesControllerTest extends AbstractRestDocsTests {
         // when
         mockMvc.perform(
                         post("/api/likes/create-likes")
-                                .with(csrf())
                                 .content(objectMapper.writeValueAsString(requestDto))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -199,7 +194,6 @@ class LikesControllerTest extends AbstractRestDocsTests {
         // when
         mockMvc.perform(
                         post("/api/likes/create-likes")
-                                .with(csrf())
                                 .content(requestBody)
                                 .contentType(MediaType.APPLICATION_JSON)
                 )

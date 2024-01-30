@@ -31,7 +31,6 @@ import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -71,7 +70,6 @@ class FollowControllerTest extends AbstractRestDocsTests {
 
         mockMvc.perform(
                         post("/api/follow/start-follow")
-                                .with(csrf())
                                 .content(objectMapper.writeValueAsString(requestDto))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -108,7 +106,6 @@ class FollowControllerTest extends AbstractRestDocsTests {
 
         mockMvc.perform(
                         post("/api/follow/start-follow")
-                                .with(csrf())
                                 .content(objectMapper.writeValueAsString(requestDto))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -129,7 +126,6 @@ class FollowControllerTest extends AbstractRestDocsTests {
         // when
         mockMvc.perform(
                         post("/api/follow/start-follow")
-                                .with(csrf())
                                 .content(objectMapper.writeValueAsString(requestDto))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -150,7 +146,6 @@ class FollowControllerTest extends AbstractRestDocsTests {
         // when
         mockMvc.perform(
                         post("/api/follow/start-follow")
-                                .with(csrf())
                                 .content(objectMapper.writeValueAsString(requestDto))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
