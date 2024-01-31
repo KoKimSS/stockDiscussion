@@ -12,7 +12,9 @@ import com.kss.stockDiscussion.web.dto.response.follow.StartFollowResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional(readOnly = true)
 @Service
 @RequiredArgsConstructor
 public class FollowServiceImpl implements FollowService {
@@ -22,6 +24,7 @@ public class FollowServiceImpl implements FollowService {
     private final NewsFeedService newsFeedService;
 
 
+    @Transactional
     @Override
     public ResponseEntity<? super StartFollowResponseDto> follow(StartFollowRequestDto dto) {
         Long followingId = dto.getFollowingId();

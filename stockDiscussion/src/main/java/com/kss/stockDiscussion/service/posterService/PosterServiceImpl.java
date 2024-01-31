@@ -13,8 +13,10 @@ import com.kss.stockDiscussion.web.dto.response.poster.CreatePosterResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class PosterServiceImpl implements PosterService {
 
@@ -22,6 +24,7 @@ public class PosterServiceImpl implements PosterService {
     private final UserJpaRepository userJpaRepository;
     private final NewsFeedService newsFeedService;
     @Override
+    @Transactional
     public ResponseEntity<? super CreatePosterResponseDto> createPoster(CreatePosterRequestDto dto) {
 
         try {

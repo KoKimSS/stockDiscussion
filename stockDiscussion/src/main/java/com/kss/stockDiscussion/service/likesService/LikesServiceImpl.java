@@ -22,14 +22,15 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 
 import java.util.Iterator;
 import java.util.Set;
 
 import static com.kss.stockDiscussion.domain.like.Likes.*;
 
+@Transactional(readOnly = true)
 @Service
 @RequiredArgsConstructor
 public class LikesServiceImpl implements LikesService{
@@ -41,6 +42,7 @@ public class LikesServiceImpl implements LikesService{
     private final RedisTemplate<String, String> redisTemplate; // Inject RedisTemplate
 
 
+    @Transactional
     @Override
     public ResponseEntity<? super CreateLikesResponseDto> createLikes(CreateLikesRequestDto dto) {
 

@@ -15,8 +15,10 @@ import com.kss.stockDiscussion.web.dto.response.reply.CreateReplyResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ReplyServiceImpl implements ReplyService{
 
@@ -25,6 +27,7 @@ public class ReplyServiceImpl implements ReplyService{
     private final PosterJpaRepository posterJpaRepository;
     private final NewsFeedService newsFeedService;
 
+    @Transactional
     @Override
     public ResponseEntity<? super CreateReplyResponseDto> createReply(CreateReplyRequestDto dto) {
         try {

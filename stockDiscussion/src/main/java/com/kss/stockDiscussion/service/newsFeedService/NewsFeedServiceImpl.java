@@ -20,8 +20,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,7 +32,7 @@ import static com.kss.stockDiscussion.domain.newsFeed.NewsFeedType.MY_LIKE;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class NewsFeedServiceImpl implements NewsFeedService {
 
     private final NewsFeedMapper newsFeedMapper;
@@ -63,6 +63,7 @@ public class NewsFeedServiceImpl implements NewsFeedService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<? super CreateNewsFeedResponseDto> createNewsFeed(
             CreateNewsFeedRequestDto dto) {
         try {

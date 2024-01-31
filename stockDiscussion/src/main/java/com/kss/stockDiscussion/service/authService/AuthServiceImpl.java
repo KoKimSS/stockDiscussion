@@ -23,12 +23,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService{
 
@@ -52,6 +54,7 @@ public class AuthServiceImpl implements AuthService{
     }
 
     @Override
+    @Transactional
     public ResponseEntity<? super EmailCertificationResponseDto> emailCertification(EmailCertificationRequestDto dto) {
         try {
             String email = dto.getEmail();
@@ -104,6 +107,7 @@ public class AuthServiceImpl implements AuthService{
         return CheckCertificationResponseDto.success();
     }
 
+    @Transactional
     @Override
     public ResponseEntity<? super SignUpResponseDto> singUp(SignUpRequestDto dto) {
 
@@ -138,6 +142,7 @@ public class AuthServiceImpl implements AuthService{
         return SignUpResponseDto.success();
     }
 
+    @Transactional
     @Override
     public ResponseEntity<? super ResponseDto> logOut(String token) {
         boolean existsByToken = jwtBlackListJpaRepository.existsByToken(token);
